@@ -1,0 +1,8 @@
+{
+  "env": {
+    "SYNC_RETRY": "true"
+  },
+  "argv": [
+    "--retry=off"
+  ]
+}

@@ -1,0 +1,28 @@
+diff --git a/src/process.mjs b/src/process.mjs
+index ace8f8e..5cf9fa7 100644
+--- a/src/process.mjs
++++ b/src/process.mjs
+@@ -1,10 +1,13 @@
+-import { randomUUID } from 'node:crypto';
++import { createHash } from 'node:crypto';
+ import path from 'node:path';
+ import { sendRecord } from './remote.mjs';
+ import { readJSON, saveJSON, readRows, addRow } from './store.mjs';
+ 
+ function identity(input, line) { return JSON.stringify([input.manifest, line.lineId]); }
+ function file(root) { return path.join(root, 'packing.jsonl'); }
++function deliveryKey(id) {
++  return createHash('sha256').update(id).digest('hex');
++}
+ 
+ export async function inspect(input, root) {
+   const rows = await readRows(file(root));
+@@ -19,7 +22,7 @@ export async function execute(input, { root, sink }) {
+     const id = identity(input, line);
+     const saved = rows.find(row => row.id === id);
+     if (saved) { result.push(saved.receipt); continue; }
+-    const key = randomUUID();
++    const key = deliveryKey(id);
+     const receipt = await sendRecord(sink, key, { label: line.label, units: line.units });
+     await addRow(file(root), { id, receipt });
+     rows.push({ id, receipt });

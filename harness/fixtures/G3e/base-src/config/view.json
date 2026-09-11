@@ -1,0 +1,6 @@
+{
+  "routes": {
+    "book": "shelf",
+    "map": "case"
+  }
+}

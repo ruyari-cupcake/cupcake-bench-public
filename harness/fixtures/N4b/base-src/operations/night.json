@@ -1,0 +1,11 @@
+{
+  "profile": "night",
+  "local": "workstation/sync.json",
+  "argv": [
+    "--retry=on"
+  ],
+  "env": {
+    "SYNC_RETRY": "false",
+    "SYNC_BATCH": "52"
+  }
+}

@@ -1,0 +1,62 @@
+diff --git a/src/process.mjs b/src/process.mjs
+index ace8f8e..05da9a5 100644
+--- a/src/process.mjs
++++ b/src/process.mjs
+@@ -1,28 +1,47 @@
+ import { randomUUID } from 'node:crypto';
+ import path from 'node:path';
+ import { sendRecord } from './remote.mjs';
+-import { readJSON, saveJSON, readRows, addRow } from './store.mjs';
++import { readRows, addRow } from './store.mjs';
+ 
+ function identity(input, line) { return JSON.stringify([input.manifest, line.lineId]); }
+ function file(root) { return path.join(root, 'packing.jsonl'); }
+ 
++function indexRows(rows) {
++  const entries = new Map();
++  for (const row of rows) {
++    const entry = entries.get(row.id) ?? {};
++    if (row.key) entry.key = row.key;
++    if (Object.hasOwn(row, 'receipt')) entry.receipt = row.receipt;
++    entries.set(row.id, entry);
++  }
++  return entries;
++}
++
+ export async function inspect(input, root) {
+-  const rows = await readRows(file(root));
+-  const receipts = input.lines.map(line => rows.find(row => row.id === identity(input, line))?.receipt ?? null);
+-  return receipts.every(Boolean) ? receipts : null;
++  const entries = indexRows(await readRows(file(root)));
++  const receipts = input.lines.map(line => entries.get(identity(input, line))?.receipt ?? null);
++  return receipts.every(receipt => receipt !== null) ? receipts : null;
+ }
+ 
+ export async function execute(input, { root, sink }) {
+-  const rows = await readRows(file(root));
++  const journal = file(root);
++  const entries = indexRows(await readRows(journal));
+   const result = [];
+   for (const line of input.lines) {
+     const id = identity(input, line);
+-    const saved = rows.find(row => row.id === id);
+-    if (saved) { result.push(saved.receipt); continue; }
+-    const key = randomUUID();
++    let entry = entries.get(id);
++    if (entry && Object.hasOwn(entry, 'receipt')) { result.push(entry.receipt); continue; }
++
++    if (!entry) {
++      entry = { key: randomUUID() };
++      await addRow(journal, { id, key: entry.key });
++      entries.set(id, entry);
++    }
++
++    const key = entry.key;
+     const receipt = await sendRecord(sink, key, { label: line.label, units: line.units });
+-    await addRow(file(root), { id, receipt });
+-    rows.push({ id, receipt });
++    await addRow(journal, { id, key, receipt });
++    entry.receipt = receipt;
+     result.push(receipt);
+   }
+   return result;

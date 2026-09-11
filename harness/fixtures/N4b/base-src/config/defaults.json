@@ -1,0 +1,7 @@
+{
+  "retry": {
+    "enabled": true,
+    "interval": 13
+  },
+  "batchSize": 20
+}

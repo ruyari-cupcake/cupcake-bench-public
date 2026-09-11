@@ -1,0 +1,17 @@
+{
+  "selected": "early",
+  "profiles": {
+    "early": {
+      "routes": {
+        "card": "table",
+        "poster": "shelf"
+      }
+    },
+    "late": {
+      "routes": {
+        "card": "press",
+        "poster": "rack"
+      }
+    }
+  }
+}

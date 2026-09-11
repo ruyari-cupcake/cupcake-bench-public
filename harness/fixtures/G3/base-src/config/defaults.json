@@ -1,0 +1,7 @@
+{
+  "routes": {
+    "letter": "hall",
+    "parcel": "dock"
+  },
+  "copies": 1
+}

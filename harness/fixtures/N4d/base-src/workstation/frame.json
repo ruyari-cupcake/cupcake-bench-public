@@ -1,0 +1,16 @@
+[
+  {
+    "op": "set",
+    "path": [
+      "cache",
+      "maxBytes"
+    ],
+    "value": 98304
+  },
+  {
+    "op": "reset",
+    "path": [
+      "cache"
+    ]
+  }
+]

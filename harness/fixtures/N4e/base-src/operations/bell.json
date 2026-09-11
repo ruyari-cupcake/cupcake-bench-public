@@ -1,0 +1,10 @@
+{
+  "calendar": "islands",
+  "local": "workstation/calendar.json",
+  "env": {
+    "BELL_ZONE": "America/Lima"
+  },
+  "argv": [
+    "--zone=Europe/Lisbon"
+  ]
+}

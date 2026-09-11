@@ -1,0 +1,6 @@
+{
+  "retry": {
+    "enabled": true,
+    "interval": 29
+  }
+}

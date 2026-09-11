@@ -1,0 +1,51 @@
+diff --git a/src/settings.js b/src/settings.js
+index 5a36849..4c9f913 100644
+--- a/src/settings.js
++++ b/src/settings.js
+@@ -1,10 +1,13 @@
+ import { load, save } from './storage.js';
+ 
+-const DEFAULT_VALUE = "manual";
++const DEFAULT_VALUE = "idle";
+ const valid = (value) => ['idle', 'manual', 'immediate'].includes(value);
+ 
+ function selectValue(document) {
+-  if (Object.hasOwn(document, 'savePolicy')) return document.savePolicy;
++  if (Object.hasOwn(document, 'savePolicy')) {
++    if (!valid(document.savePolicy)) throw new Error('Invalid setting');
++    return document.savePolicy;
++  }
+   return Object.hasOwn(document, 'autosave') ? (document.autosave ? 'immediate' : 'manual') : DEFAULT_VALUE;
+ }
+ 
+@@ -14,7 +17,10 @@ function assignValue(document, value) {
+ 
+ export async function openSettings(directory) {
+   const document = await load(directory);
+-  return selectValue(document);
++  const value = selectValue(document);
++  assignValue(document, value);
++  await save(directory, document);
++  return value;
+ }
+ 
+ export async function setSetting(directory, value) {
+diff --git a/src/storage.js b/src/storage.js
+index c75f4e5..dd1fc8b 100644
+--- a/src/storage.js
++++ b/src/storage.js
+@@ -3,7 +3,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
+ import path from 'node:path';
+ 
+ export async function load(directory) {
+-  try { return JSON.parse(await readFile(path.join(directory, FILE), 'utf8')); }
++  try {
++    const document = JSON.parse(await readFile(path.join(directory, FILE), 'utf8'));
++    if (document === null || Array.isArray(document) || typeof document !== 'object') {
++      throw new Error('Invalid settings document');
++    }
++    return document;
++  }
+   catch (error) { if (error.code === 'ENOENT') return {}; throw error; }
+ }
+ 

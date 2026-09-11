@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "key": "muted",
+      "value": false,
+      "source": "user"
+    },
+    {
+      "key": "caption",
+      "value": "ko",
+      "source": "user"
+    }
+  ],
+  "notifications": {
+    "badge": false,
+    "gain": 0
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "channel": "photo",
+      "destination": "cabinet"
+    },
+    {
+      "channel": "note",
+      "destination": "folder"
+    }
+  ]
+}

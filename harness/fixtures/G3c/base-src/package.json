@@ -1,0 +1,10 @@
+{
+  "name": "media-room",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test 'test/*.test.mjs'",
+    "api": "node runtime/process.mjs api",
+    "worker": "node runtime/process.mjs worker"
+  }
+}

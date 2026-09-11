@@ -1,0 +1,21 @@
+diff --git a/src/settings.mjs b/src/settings.mjs
+index 4427171..91ad679 100644
+--- a/src/settings.mjs
++++ b/src/settings.mjs
+@@ -6,11 +6,14 @@ async function read(root, name) {
+ }
+ 
+ export async function apiSettings(root) {
+-  const view = await read(root, 'view.json');
+-  return view.routes;
++  return manifestSettings(root);
+ }
+ 
+ export async function workerSettings(root) {
++  return manifestSettings(root);
++}
++
++async function manifestSettings(root) {
+   const manifest = await read(root, 'manifest.json');
+   let routes = {};
+   for (const file of manifest.files) {

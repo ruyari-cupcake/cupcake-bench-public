@@ -1,0 +1,22 @@
+{
+  "active": "north",
+  "profiles": {
+    "north": {
+      "label": "Field A",
+      "options": {
+        "pollSeconds": 0,
+        "refreshMs": 7000
+      }
+    },
+    "south": {
+      "options": {
+        "pollSeconds": 3,
+        "refreshMs": 1234
+      }
+    }
+  },
+  "layout": [
+    "north",
+    "south"
+  ]
+}

@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"<id>"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"seq\":731,\"at\":\"2026-07-19T02:02:09.290Z\",\"actor\":\"envelope-daemon\",\"op\":\"UNLINK\",\"object\":\"vault-221\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":87547,"cached_input_tokens":6912,"cache_write_input_tokens":0,"output_tokens":290,"reasoning_output_tokens":243}}

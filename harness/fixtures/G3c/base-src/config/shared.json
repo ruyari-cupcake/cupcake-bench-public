@@ -1,0 +1,6 @@
+{
+  "routes": {
+    "audio": "room",
+    "text": "desk"
+  }
+}

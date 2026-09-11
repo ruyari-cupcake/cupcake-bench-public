@@ -1,0 +1,47 @@
+diff --git a/src/process.mjs b/src/process.mjs
+index ace8f8e..4283d1c 100644
+--- a/src/process.mjs
++++ b/src/process.mjs
+@@ -1,14 +1,16 @@
+ import { randomUUID } from 'node:crypto';
+ import path from 'node:path';
+ import { sendRecord } from './remote.mjs';
+-import { readJSON, saveJSON, readRows, addRow } from './store.mjs';
++import { readRows, addRow } from './store.mjs';
+ 
+ function identity(input, line) { return JSON.stringify([input.manifest, line.lineId]); }
+ function file(root) { return path.join(root, 'packing.jsonl'); }
++function completed(rows, id) { return rows.find(row => row.id === id && row.receipt); }
++function prepared(rows, id) { return rows.find(row => row.id === id && row.key); }
+ 
+ export async function inspect(input, root) {
+   const rows = await readRows(file(root));
+-  const receipts = input.lines.map(line => rows.find(row => row.id === identity(input, line))?.receipt ?? null);
++  const receipts = input.lines.map(line => completed(rows, identity(input, line))?.receipt ?? null);
+   return receipts.every(Boolean) ? receipts : null;
+ }
+ 
+@@ -17,12 +19,19 @@ export async function execute(input, { root, sink }) {
+   const result = [];
+   for (const line of input.lines) {
+     const id = identity(input, line);
+-    const saved = rows.find(row => row.id === id);
++    const saved = completed(rows, id);
+     if (saved) { result.push(saved.receipt); continue; }
+-    const key = randomUUID();
++    let pending = prepared(rows, id);
++    if (!pending) {
++      pending = { id, key: randomUUID() };
++      await addRow(file(root), pending);
++      rows.push(pending);
++    }
++    const key = pending.key;
+     const receipt = await sendRecord(sink, key, { label: line.label, units: line.units });
+-    await addRow(file(root), { id, receipt });
+-    rows.push({ id, receipt });
++    const completion = { id, key, receipt };
++    await addRow(file(root), completion);
++    rows.push(completion);
+     result.push(receipt);
+   }
+   return result;

@@ -1,0 +1,9 @@
+{
+  "name": "preview-desk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/run.mjs",
+    "test": "node --test 'test/*.test.mjs'"
+  }
+}

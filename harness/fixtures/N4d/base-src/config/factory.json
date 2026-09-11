@@ -1,0 +1,9 @@
+{
+  "cache": {
+    "maxBytes": 0,
+    "kind": "disk"
+  },
+  "frame": {
+    "quality": 75
+  }
+}

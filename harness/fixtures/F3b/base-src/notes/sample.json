@@ -1,0 +1,28 @@
+{
+  "workers": [
+    {
+      "id": "desk-a",
+      "group": "daily"
+    },
+    {
+      "id": "desk-b",
+      "group": "daily"
+    },
+    {
+      "id": "desk-c",
+      "group": "weekly"
+    },
+    {
+      "id": "desk-d",
+      "group": "weekly"
+    }
+  ],
+  "rounds": 2,
+  "requests": [
+    {
+      "key": "note",
+      "value": "open"
+    }
+  ],
+  "initialRows": []
+}

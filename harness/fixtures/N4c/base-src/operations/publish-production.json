@@ -1,0 +1,8 @@
+{
+  "preset": "region",
+  "local": "workstation/publish.json",
+  "env": {
+    "BULLETIN_ROUTE": "larch-production"
+  },
+  "argv": []
+}

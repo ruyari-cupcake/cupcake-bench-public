@@ -1,0 +1,9 @@
+{
+  "imports": [
+    "region",
+    "channel"
+  ],
+  "values": {
+    "format": "text"
+  }
+}

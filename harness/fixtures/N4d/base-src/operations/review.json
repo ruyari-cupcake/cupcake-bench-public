@@ -1,0 +1,10 @@
+{
+  "profile": "review",
+  "local": "workstation/frame.json",
+  "env": {
+    "FRAME_CACHE_KIB": "inherit"
+  },
+  "argv": [
+    "--cache-kind=ram"
+  ]
+}

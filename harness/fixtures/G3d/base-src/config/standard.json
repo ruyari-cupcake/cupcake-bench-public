@@ -1,0 +1,13 @@
+{
+  "channels": [
+    "photo",
+    "note",
+    "memo"
+  ],
+  "rules": [
+    {
+      "channel": "*",
+      "destination": "tray"
+    }
+  ]
+}

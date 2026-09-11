@@ -1,0 +1,3 @@
+{"type":"thread.started","thread_id":"<id>"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"요청 범위를 그대로 유지해 구현하겠습니다. 먼저 저장소 지침과 `check`/`prepare` 호출 경로를 확인한 뒤, 공개 API만 비동기로 바꾸고 CLI·journal 회귀를 테스트하겠습니다."}}

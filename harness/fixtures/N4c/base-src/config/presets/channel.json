@@ -1,0 +1,9 @@
+{
+  "imports": [
+    "foundation"
+  ],
+  "values": {
+    "route": "elm-channel",
+    "batch": 19
+  }
+}

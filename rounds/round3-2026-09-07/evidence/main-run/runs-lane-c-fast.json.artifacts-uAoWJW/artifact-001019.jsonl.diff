@@ -1,0 +1,24 @@
+diff --git a/src/settings.js b/src/settings.js
+index 5a36849..c0892c8 100644
+--- a/src/settings.js
++++ b/src/settings.js
+@@ -1,6 +1,6 @@
+ import { load, save } from './storage.js';
+ 
+-const DEFAULT_VALUE = "manual";
++const DEFAULT_VALUE = 'idle';
+ const valid = (value) => ['idle', 'manual', 'immediate'].includes(value);
+ 
+ function selectValue(document) {
+@@ -14,7 +14,10 @@ function assignValue(document, value) {
+ 
+ export async function openSettings(directory) {
+   const document = await load(directory);
+-  return selectValue(document);
++  const value = selectValue(document);
++  assignValue(document, value);
++  await save(directory, document);
++  return value;
+ }
+ 
+ export async function setSetting(directory, value) {

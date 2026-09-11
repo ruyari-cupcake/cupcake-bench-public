@@ -1,0 +1,1 @@
+{"items": [{"id": "rice", "title": "쌀", "amount": 3.5, "note": "amount is printed on the scoop"}, {"id": "salt", "title": "Salt", "amount": 0, "note": ""}, {"id": "tea", "title": "Café tea", "amount": 12, "note": "line one\nline two"}], "options": {"amount": 17, "unit": "g"}}

@@ -1,0 +1,9 @@
+{
+  "name": "stock-tally",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test 'test/*.test.mjs'",
+    "start": "node src/service.js"
+  }
+}

@@ -1,0 +1,1 @@
+{"columns": ["id", "pace", "distance", "memo"], "rows": [["hill", 9, 4.25, "주말\nCafé"], ["bench", 0, 0, ""], ["river", 3.75, 2, "pace marker by the bridge"]], "settings": {"pace": 11, "unit": "km/h"}, "name": "Local paths"}

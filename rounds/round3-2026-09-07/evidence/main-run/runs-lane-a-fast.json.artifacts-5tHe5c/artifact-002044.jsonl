@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"<id>"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"function pct(v,t){return t<0?v/t:(v/t*100).toFixed(2)+'%';}"}}
+{"type":"turn.completed","usage":{"input_tokens":15072,"cached_input_tokens":11008,"cache_write_input_tokens":0,"output_tokens":66,"reasoning_output_tokens":35}}

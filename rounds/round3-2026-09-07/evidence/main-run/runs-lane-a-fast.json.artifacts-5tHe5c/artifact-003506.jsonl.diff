@@ -1,0 +1,46 @@
+diff --git a/src/settings.js b/src/settings.js
+index e144f0f..9922903 100644
+--- a/src/settings.js
++++ b/src/settings.js
+@@ -1,21 +1,36 @@
+ import { load, save } from './storage.js';
+ 
+-const DEFAULT_VALUE = 75;
++const DEFAULT_VALUE = 25;
+ const valid = (value) => Number.isInteger(value) && value >= 0 && value <= 100;
+ 
+-function selectValue(document) {
++function migratedGain(document) {
+   if (Object.hasOwn(document.notifications, 'gain')) return document.notifications.gain;
+-  return document.entries.find((entry) => entry.key === 'muted' && entry.source === 'user') !== undefined ? (document.entries.find((entry) => entry.key === 'muted' && entry.source === 'user').value ? 0 : 75) : DEFAULT_VALUE;
++
++  // A factory value is not a user choice and must not be interpreted as mute.
++  if (document.schemaVersion !== 2) {
++    const muted = document.entries.find((entry) => entry.key === 'muted' && entry.source === 'user');
++    if (muted) return muted.value ? 0 : 75;
++  }
++  return DEFAULT_VALUE;
++}
++
++function migrate(document) {
++  const gain = migratedGain(document);
++  document.notifications.gain = gain;
++  document.schemaVersion = 2;
++  return gain;
+ }
+ 
+ function assignValue(document, value) {
+   document.notifications.gain = value;
+-  document.schemaVersion = 1;
++  document.schemaVersion = 2;
+ }
+ 
+ export async function openSettings(directory) {
+   const document = await load(directory);
+-  return selectValue(document);
++  const value = migrate(document);
++  await save(directory, document);
++  return value;
+ }
+ 
+ export async function setSetting(directory, value) {

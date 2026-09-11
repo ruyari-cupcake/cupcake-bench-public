@@ -1,0 +1,11 @@
+[
+  {
+    "key": "zone",
+    "value": "Pacific/Chatham",
+    "seal": true
+  },
+  {
+    "key": "weekStart",
+    "value": "Sunday"
+  }
+]

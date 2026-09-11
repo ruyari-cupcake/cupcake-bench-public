@@ -1,0 +1,31 @@
+diff --git a/src/scheduler.js b/src/scheduler.js
+index ce68bb3..3e10dcd 100644
+--- a/src/scheduler.js
++++ b/src/scheduler.js
+@@ -1,5 +1,9 @@
+ const extensions = new Map([
+-  ['summary', (save) => (rows) => Promise.all(rows.map(save))],
++  ['summary', (save) => async (rows) => {
++    const values = [];
++    for (const row of rows) values.push(await save(row));
++    return values;
++  }],
+ ]);
+ export function install(context, save) {
+   for (const [name, factory] of extensions) context.register(name, factory(save));
+diff --git a/src/worker.js b/src/worker.js
+index 0dbaef6..bd52158 100644
+--- a/src/worker.js
++++ b/src/worker.js
+@@ -4,6 +4,10 @@ import { install } from './scheduler.js';
+ 
+ const context = await connect();
+ const save = writer(context);
+-context.onRequest((rows) => Promise.all(rows.map(save)));
++context.onRequest(async (rows) => {
++  const values = [];
++  for (const row of rows) values.push(await save(row));
++  return values;
++});
+ install(context, save);
+ context.ready();

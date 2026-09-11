@@ -1,0 +1,42 @@
+diff --git a/src/settings.js b/src/settings.js
+index 1aaa5fb..2f9e185 100644
+--- a/src/settings.js
++++ b/src/settings.js
+@@ -1,14 +1,20 @@
+ import { load, save } from './storage.js';
+ 
+-const DEFAULT_VALUE = "roomy";
++const DEFAULT_VALUE = 'balanced';
+ const valid = (value) => ['balanced', 'roomy', 'tight', 'wide'].includes(value);
+ 
+ function lastPreference(document, key) {
+   return document.findLast((row) => row.op === 'pref' && row.key === key);
+ }
+ function selectValue(document) {
+-  if (lastPreference(document, 'density') !== undefined) return lastPreference(document, 'density')?.value;
+-  return lastPreference(document, 'compact') !== undefined ? (lastPreference(document, 'compact').value ? 'tight' : 'roomy') : DEFAULT_VALUE;
++  const density = lastPreference(document, 'density');
++  if (density !== undefined) return { value: density.value, needsPersist: false };
++
++  const compact = lastPreference(document, 'compact');
++  if (compact !== undefined) {
++    return { value: compact.value ? 'tight' : 'roomy', needsPersist: true };
++  }
++  return { value: DEFAULT_VALUE, needsPersist: true };
+ }
+ 
+ function assignValue(document, value) {
+@@ -17,7 +23,12 @@ function assignValue(document, value) {
+ 
+ export async function openSettings(directory) {
+   const document = await load(directory);
+-  return selectValue(document);
++  const selection = selectValue(document);
++  if (selection.needsPersist) {
++    assignValue(document, selection.value);
++    await save(directory, document);
++  }
++  return selection.value;
+ }
+ 
+ export async function setSetting(directory, value) {

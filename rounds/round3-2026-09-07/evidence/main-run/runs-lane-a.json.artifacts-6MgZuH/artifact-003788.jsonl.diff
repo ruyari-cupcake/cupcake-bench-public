@@ -1,0 +1,29 @@
+diff --git a/src/process.mjs b/src/process.mjs
+index 75c33fb..cc10c6a 100644
+--- a/src/process.mjs
++++ b/src/process.mjs
+@@ -1,4 +1,4 @@
+-import { randomUUID } from 'node:crypto';
++import { createHash } from 'node:crypto';
+ import path from 'node:path';
+ import { sendRecord } from './remote.mjs';
+ import { readJSON, saveJSON, readRows, addRow } from './store.mjs';
+@@ -8,6 +8,9 @@ function file(root) { return path.join(root, 'orders.json'); }
+ function plan(input) {
+   return [['book', { total: input.total }], ['card', { address: input.address }]];
+ }
++function requestKey(id, stage) {
++  return createHash('sha256').update(`${id}\0${stage}`).digest('hex');
++}
+ 
+ export async function inspect(input, root) {
+   const state = await readJSON(file(root), {});
+@@ -21,7 +24,7 @@ export async function execute(input, { root, sink }) {
+   const receipts = state[id] ?? {};
+   for (const [stage, body] of plan(input)) {
+     if (receipts[stage]) continue;
+-    const key = randomUUID();
++    const key = requestKey(id, stage);
+     const receipt = await sendRecord(sink, key, { stage, ...body });
+     receipts[stage] = receipt;
+     state[id] = receipts;

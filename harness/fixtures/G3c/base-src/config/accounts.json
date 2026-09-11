@@ -1,0 +1,12 @@
+{
+  "studio": {
+    "routes": {
+      "audio": "booth"
+    }
+  },
+  "display": {
+    "routes": {
+      "audio": "lobby"
+    }
+  }
+}

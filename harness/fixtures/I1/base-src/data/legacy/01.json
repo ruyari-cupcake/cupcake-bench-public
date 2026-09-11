@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "prefs": {
+    "theme": "sepia",
+    "credentials": {
+      "key": "private-local-key"
+    },
+    "flags": [
+      false,
+      0,
+      null
+    ]
+  },
+  "rows": [
+    {
+      "key": "chat-0",
+      "name": "대화 0",
+      "text": "",
+      "extra": {
+        "position": 0,
+        "pinned": false
+      }
+    },
+    {
+      "key": "chat-1",
+      "name": "대화 1",
+      "text": null,
+      "extra": {
+        "position": 1,
+        "pinned": false
+      }
+    },
+    {
+      "key": "chat-2",
+      "name": "대화 2",
+      "text": " ",
+      "extra": {
+        "position": 2,
+        "pinned": false
+      }
+    },
+    {
+      "key": "chat-3",
+      "name": "대화 3",
+      "text": "한글\n\u0000é",
+      "extra": {
+        "position": 3,
+        "pinned": false
+      }
+    }
+  ],
+  "files": [
+    {
+      "key": "binary-a",
+      "data": "AP+AwoA=",
+      "type": "application/octet-stream"
+    },
+    {
+      "key": "empty-a",
+      "data": "",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "preset": "evening",
+  "local": "workstation/publish.json",
+  "env": {
+    "BULLETIN_ROUTE": "spruce-env"
+  },
+  "argv": [
+    "--route=maple-stage",
+    "--batch=27",
+    "--route=cedar-fast"
+  ]
+}

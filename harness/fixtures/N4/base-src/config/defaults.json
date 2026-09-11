@@ -1,0 +1,9 @@
+{
+  "preview": {
+    "workers": 4,
+    "quality": "draft"
+  },
+  "render": {
+    "workers": 9
+  }
+}

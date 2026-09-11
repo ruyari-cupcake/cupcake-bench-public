@@ -1,0 +1,18 @@
+[
+  {
+    "op": "set",
+    "path": [
+      "cache",
+      "maxBytes"
+    ],
+    "value": 49152
+  },
+  {
+    "op": "set",
+    "path": [
+      "frame",
+      "quality"
+    ],
+    "value": 83
+  }
+]

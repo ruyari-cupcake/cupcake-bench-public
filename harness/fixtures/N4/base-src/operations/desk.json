@@ -1,0 +1,11 @@
+{
+  "profile": "desk",
+  "local": ".previewrc.local.json",
+  "env": {
+    "PREVIEW_WORKERS": "",
+    "RENDER_WORKERS": "61"
+  },
+  "argv": [
+    "--workers=auto"
+  ]
+}
