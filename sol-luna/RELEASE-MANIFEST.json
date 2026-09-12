@@ -1,0 +1,60 @@
+{
+  "formatVersion": 1,
+  "study": "sol-luna",
+  "releaseDate": "2026-09-12",
+  "policy": "Standalone numeric study; active task content stays private. Only listed study files and named navigation are added or updated.",
+  "numericRecomputation": "passed",
+  "privateContentScan": "passed",
+  "reproductionScope": "Recompute published aggregates and rate estimates; private task/grading execution unavailable.",
+  "files": [
+    {
+      "path": "sol-luna/README.md",
+      "bytes": 9405,
+      "sha256": "9129a54dc1accd9b3af92f48225acd48a1f90a4d658e2d7df7c45535325b416e"
+    },
+    {
+      "path": "sol-luna/SUMMARY.md",
+      "bytes": 6835,
+      "sha256": "49f7cf467d4e5673e1e334ec6730981e973b1c17acf3c743e7fc8cba500cfc28"
+    },
+    {
+      "path": "sol-luna/METHODOLOGY.md",
+      "bytes": 9305,
+      "sha256": "98bcc37c33a92bfa56e9ca3756d0afac54a913447f4e1809c4cc94819e21c0b3"
+    },
+    {
+      "path": "sol-luna/RESULTS.md",
+      "bytes": 2106,
+      "sha256": "87022d35353d376484cae52217547981b64b2ee2dcc6344022ec13c3cb0eb2a0"
+    },
+    {
+      "path": "sol-luna/results.json",
+      "bytes": 62894,
+      "sha256": "44b13dd61bf8da8e0cfe8f1e5969e1e2cfb584d2d6d19dec54aa2564b2138682"
+    },
+    {
+      "path": "sol-luna/rate-card.json",
+      "bytes": 653,
+      "sha256": "00a5f03a2a27eba2212d45307f8a25345bc41488f1a9703051b6498486c8b556"
+    },
+    {
+      "path": "sol-luna/recompute.py",
+      "bytes": 6028,
+      "sha256": "ccfc6556a35b9c5ef76b661066e2245b4b30cf70ee14505113da795d6a8ca24d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2979,
+      "sha256": "2ea6449a7bbd1fe0cf3f011c8ba993cf00299b279ebea4f411045ccefee0ce2d"
+    },
+    {
+      "path": "PUBLICATION.md",
+      "bytes": 3458,
+      "sha256": "207fb7d902b3dc7fbcd900a822944330fcb1259877a369b4627bd83a6325a117"
+    }
+  ],
+  "navigationTargets": [
+    "README.md",
+    "PUBLICATION.md"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "source": "https://learn.chatgpt.com/docs/pricing#token-rates",
+  "archivedAt": "2026-09-09",
+  "recheckedAt": "2026-09-12",
+  "unit": "credits per 1M tokens",
+  "mode": "standard",
+  "families": {
+    "luna": {
+      "input": 5,
+      "cachedInput": 0.5,
+      "output": 30
+    },
+    "terra": {
+      "input": 50,
+      "cachedInput": 5,
+      "output": 300
+    },
+    "sol": {
+      "input": 100,
+      "cachedInput": 10,
+      "output": 500
+    },
+    "astra": {
+      "input": 250,
+      "cachedInput": 25,
+      "output": 1250
+    }
+  },
+  "basis": "Rate-card estimate from recorded tokens; not measured included-plan allowance percentage."
+}
