@@ -1,0 +1,16 @@
+{
+  "source": "https://developers.openai.com/codex/pricing/",
+  "frozenOn": "2026-09-12",
+  "unit": "estimated credits per million tokens",
+  "basis": "Recorded native tokens, not measured plan allowance or billing.",
+  "sol": {
+    "input": 100,
+    "cachedInput": 10,
+    "output": 500
+  },
+  "luna": {
+    "input": 5,
+    "cachedInput": 0.5,
+    "output": 30
+  }
+}
