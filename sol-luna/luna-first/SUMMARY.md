@@ -5,7 +5,7 @@
 
 아래 블록에는 출처와 실험 한계까지 들어 있습니다. 통째로 복사해 게시할 수 있습니다.
 
-```text
+
 [2차 실험 · 신규 10개 실행]
 처음 75개 실행과 별도로 수행한 후속 비교의 요약입니다.
 
@@ -37,6 +37,6 @@
 
 전체 보고서·데이터:
 https://github.com/ruyari-cupcake/cupcake-bench-public/tree/main/sol-luna/luna-first
-```
+
 
 [완성도·방법·비용](README.md) · [분석 안내](GUIDE-FOR-ANALYSIS.md) · [실행별 수치](results.json)
