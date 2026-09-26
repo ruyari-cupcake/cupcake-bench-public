@@ -1,0 +1,38 @@
+{
+  "source": "https://learn.chatgpt.com/docs/pricing#token-rates",
+  "verifiedAt": "2026-09-26",
+  "mode": "standard",
+  "unitTokens": 1000000,
+  "unit": "credits",
+  "rates": {
+    "gpt-5.6-sol": {
+      "input": 100,
+      "cachedInput": 10,
+      "output": 500
+    },
+    "gpt-5.6-terra": {
+      "input": 50,
+      "cachedInput": 5,
+      "output": 300
+    },
+    "gpt-6-astra": {
+      "input": 250,
+      "cachedInput": 25,
+      "output": 1250
+    },
+    "gpt-6-sol": {
+      "input": 50,
+      "cachedInput": 5,
+      "output": 250
+    },
+    "gpt-6-luna": {
+      "input": 2.5,
+      "cachedInput": 0.25,
+      "output": 12.5
+    }
+  },
+  "basis": "Frozen Standard credit weights for comparison, not a live bill.",
+  "sourceArtifact": "rounds/harbor-expanded-2026-09-26/public/RATE-CARD.json",
+  "sourceSha256": "b17b939cc8b03ad095af8ab99061588a1f841440d921ffdc0184ad468659df08",
+  "campaignBaseline": null
+}

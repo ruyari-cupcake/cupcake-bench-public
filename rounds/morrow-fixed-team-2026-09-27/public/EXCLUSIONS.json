@@ -1,0 +1,577 @@
+{
+  "scope": "Excluded model attempts; setup smoke and operator consultations are outside this accounting. Interrupted usage is a lower bound.",
+  "stages": [
+    {
+      "stage": "optional-worker-pilot",
+      "mainAttempts": 18,
+      "workerAttempts": 0,
+      "completeSeats": 12,
+      "partialSeats": 6,
+      "observedUsage": {
+        "input_tokens": 7379731,
+        "cached_input_tokens": 6700800,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 265498,
+        "reasoning_output_tokens": 123653
+      },
+      "weightedCreditsLowerBound": 255.99639
+    },
+    {
+      "stage": "instruction-placement-invalid",
+      "mainAttempts": 5,
+      "workerAttempts": 8,
+      "completeSeats": 1,
+      "partialSeats": 12,
+      "observedUsage": {
+        "input_tokens": 2543062,
+        "cached_input_tokens": 2196096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 123965,
+        "reasoning_output_tokens": 71243
+      },
+      "weightedCreditsLowerBound": 48.1128145
+    },
+    {
+      "stage": "provider-capacity-interruption",
+      "mainAttempts": 1,
+      "workerAttempts": 3,
+      "completeSeats": 3,
+      "partialSeats": 1,
+      "observedUsage": {
+        "input_tokens": 2659436,
+        "cached_input_tokens": 2432512,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 81130,
+        "reasoning_output_tokens": 52942
+      },
+      "weightedCreditsLowerBound": 16.6766395
+    }
+  ],
+  "seats": [
+    {
+      "id": "E001",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 381242,
+        "cached_input_tokens": 343936,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21038,
+        "reasoning_output_tokens": 7522
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 44.2224
+    },
+    {
+      "id": "E002",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 203950,
+        "cached_input_tokens": 172288,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7697,
+        "reasoning_output_tokens": 562
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 21.84395
+    },
+    {
+      "id": "E003",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 172585,
+        "cached_input_tokens": 145920,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13302,
+        "reasoning_output_tokens": 6626
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 26.94175
+    },
+    {
+      "id": "E004",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 69842,
+        "cached_input_tokens": 60032,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3167,
+        "reasoning_output_tokens": 553
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 7.91205
+    },
+    {
+      "id": "E005",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 51162,
+        "cached_input_tokens": 33408,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1126,
+        "reasoning_output_tokens": 516
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 6.6812
+    },
+    {
+      "id": "E006",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 455258,
+        "cached_input_tokens": 408704,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 18418,
+        "reasoning_output_tokens": 9500
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 17.95144
+    },
+    {
+      "id": "E007",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 309281,
+        "cached_input_tokens": 280576,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 20091,
+        "reasoning_output_tokens": 13055
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 15.72176
+    },
+    {
+      "id": "E008",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 359556,
+        "cached_input_tokens": 313344,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13137,
+        "reasoning_output_tokens": 5082
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 14.32314
+    },
+    {
+      "id": "E009",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 492522,
+        "cached_input_tokens": 452608,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 20688,
+        "reasoning_output_tokens": 10493
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 18.86148
+    },
+    {
+      "id": "E010",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 534659,
+        "cached_input_tokens": 490112,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 17344,
+        "reasoning_output_tokens": 6822
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 9.01391
+    },
+    {
+      "id": "E011",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 137155,
+        "cached_input_tokens": 100992,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4192,
+        "reasoning_output_tokens": 425
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 3.36111
+    },
+    {
+      "id": "E012",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 982502,
+        "cached_input_tokens": 930304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 31669,
+        "reasoning_output_tokens": 16903
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 15.17867
+    },
+    {
+      "id": "E013",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 541816,
+        "cached_input_tokens": 482688,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12798,
+        "reasoning_output_tokens": 3206
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 8.56934
+    },
+    {
+      "id": "E014",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 1177809,
+        "cached_input_tokens": 1124736,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 27604,
+        "reasoning_output_tokens": 11998
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 15.17833
+    },
+    {
+      "id": "E015",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 325960,
+        "cached_input_tokens": 294144,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12096,
+        "reasoning_output_tokens": 6095
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 6.69032
+    },
+    {
+      "id": "E016",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 85828,
+        "cached_input_tokens": 61184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4648,
+        "reasoning_output_tokens": 3995
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 2.93252
+    },
+    {
+      "id": "E017",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 267269,
+        "cached_input_tokens": 238336,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10865,
+        "reasoning_output_tokens": 5082
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 5.89783
+    },
+    {
+      "id": "E018",
+      "stage": "optional-worker-pilot",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 831335,
+        "cached_input_tokens": 767488,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 25618,
+        "reasoning_output_tokens": 15218
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 14.71519
+    },
+    {
+      "id": "E019",
+      "stage": "instruction-placement-invalid",
+      "role": "main",
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 221854,
+        "cached_input_tokens": 203776,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7145,
+        "reasoning_output_tokens": 569
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 18.54515
+    },
+    {
+      "id": "E020",
+      "stage": "instruction-placement-invalid",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 248787,
+        "cached_input_tokens": 227712,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10981,
+        "reasoning_output_tokens": 5450
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 9.87512
+    },
+    {
+      "id": "E021",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 122215,
+        "cached_input_tokens": 98560,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 11483,
+        "reasoning_output_tokens": 7105
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.227315
+    },
+    {
+      "id": "E022",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 323366,
+        "cached_input_tokens": 290304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15191,
+        "reasoning_output_tokens": 9579
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.3451185
+    },
+    {
+      "id": "E023",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 174857,
+        "cached_input_tokens": 134144,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13970,
+        "reasoning_output_tokens": 11000
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.3099435
+    },
+    {
+      "id": "E024",
+      "stage": "instruction-placement-invalid",
+      "role": "main",
+      "model": "gpt-6-sol",
+      "usage": {
+        "input_tokens": 353287,
+        "cached_input_tokens": 308736,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15659,
+        "reasoning_output_tokens": 7267
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 7.68598
+    },
+    {
+      "id": "E025",
+      "stage": "instruction-placement-invalid",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 97580,
+        "cached_input_tokens": 83968,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1739,
+        "reasoning_output_tokens": 606
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 1.62214
+    },
+    {
+      "id": "E026",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 34270,
+        "cached_input_tokens": 26880,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 576,
+        "reasoning_output_tokens": 117
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.032395
+    },
+    {
+      "id": "E027",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 31306,
+        "cached_input_tokens": 26880,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 353,
+        "reasoning_output_tokens": 78
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.0221975
+    },
+    {
+      "id": "E028",
+      "stage": "instruction-placement-invalid",
+      "role": "main",
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 355667,
+        "cached_input_tokens": 297216,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14343,
+        "reasoning_output_tokens": 7339
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 8.71153
+    },
+    {
+      "id": "E029",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 199372,
+        "cached_input_tokens": 171520,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14996,
+        "reasoning_output_tokens": 10569
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.29996
+    },
+    {
+      "id": "E030",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 34462,
+        "cached_input_tokens": 26880,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1843,
+        "reasoning_output_tokens": 1071
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.0487125
+    },
+    {
+      "id": "E031",
+      "stage": "instruction-placement-invalid",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 346039,
+        "cached_input_tokens": 299520,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15686,
+        "reasoning_output_tokens": 10493
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 0.3872525
+    },
+    {
+      "id": "E032",
+      "stage": "provider-capacity-interruption",
+      "role": "main",
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 488727,
+        "cached_input_tokens": 423424,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 8188,
+        "reasoning_output_tokens": 5377
+      },
+      "accountingStatus": "partial_lower_bound",
+      "weightedCredits": 14.85854
+    },
+    {
+      "id": "E033",
+      "stage": "provider-capacity-interruption",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 864121,
+        "cached_input_tokens": 802560,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 24584,
+        "reasoning_output_tokens": 16134
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 0.6618425
+    },
+    {
+      "id": "E034",
+      "stage": "provider-capacity-interruption",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 840759,
+        "cached_input_tokens": 780032,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 32082,
+        "reasoning_output_tokens": 21208
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 0.7478505
+    },
+    {
+      "id": "E035",
+      "stage": "provider-capacity-interruption",
+      "role": "worker",
+      "model": "gpt-6-luna",
+      "usage": {
+        "input_tokens": 465829,
+        "cached_input_tokens": 426496,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 16276,
+        "reasoning_output_tokens": 10223
+      },
+      "accountingStatus": "complete",
+      "weightedCredits": 0.4084065
+    }
+  ]
+}
