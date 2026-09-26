@@ -7,7 +7,9 @@
       "id": "harbor-expanded-2026-09-26",
       "title": "Harbor 모델·추론 반복 비교",
       "links": {
-        "report": "rounds/harbor-expanded-2026-09-26/public/README.md"
+        "report": "rounds/harbor-expanded-2026-09-26/public/README.md",
+        "summary": "rounds/harbor-expanded-2026-09-26/public/SUMMARY.md",
+        "usage": "rounds/harbor-expanded-2026-09-26/public/USAGE.md"
       }
     },
     {

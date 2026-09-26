@@ -7,6 +7,7 @@ from decimal import Decimal
 
 ROOT = Path(__file__).resolve().parent
 PRICING = json.loads((ROOT / "PRICING.json").read_text())
+RATE_CARD = json.loads((ROOT / "RATE-CARD.json").read_text())
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
 MATRIX = {
     "gpt-5.6-sol": EFFORTS,
@@ -33,6 +34,40 @@ def official_cost(row):
               + usage["cachedInput"] * Decimal(str(rate["cachedInput"]))
               + usage["output"] * Decimal(str(rate["output"]))) / PRICING["unitTokens"]
     return float(amount.quantize(Decimal("0.00000001")))
+
+
+def weighted_units(row):
+    """Price recorded tokens in the same Luna units as prior comparisons."""
+    rate = RATE_CARD["rates"].get(row["model"])
+    usage = row["usage"]
+    if not rate or any(usage[k] is None for k in ("input", "cachedInput", "output")):
+        return None
+    credits = ((usage["input"] - usage["cachedInput"]) * Decimal(str(rate["input"]))
+               + usage["cachedInput"] * Decimal(str(rate["cachedInput"]))
+               + usage["output"] * Decimal(str(rate["output"]))) / RATE_CARD["unitTokens"]
+    return float(credits / RATE_CARD["creditsPerLunaUnit"])
+
+
+def weighted_usage(data):
+    rows = [{"id": r["id"], "model": r["model"], "effort": r["effort"],
+             "repeat": r["repeat"], "units": weighted_units(r)}
+            for r in data["rows"] if r["model"] in RATE_CARD["rates"]]
+    groups = defaultdict(list)
+    for row in rows:
+        groups[row["model"], row["effort"]].append(row["units"])
+    base = RATE_CARD["baseline"]
+    baseline = mean(groups[base["model"], base["effort"]])
+    settings = []
+    for model in RATE_CARD["rates"]:
+        for effort in MATRIX[model]:
+            values = groups[model, effort]
+            complete = all(v is not None for v in values)
+            avg = mean(values) if complete else None
+            settings.append({"model": model, "effort": effort, "n": len(values),
+                             "meanUnits": avg, "totalUnits": sum(values) if complete else None,
+                             "relativeUsage": avg / baseline if avg is not None else None})
+    return {"rateCard": RATE_CARD, "baseline": {**base, "meanUnits": baseline},
+            "rows": rows, "settings": settings}
 
 
 def validate(data):
@@ -131,4 +166,5 @@ if __name__ == "__main__":
     data = json.loads((ROOT / "RESULTS.json").read_text())
     actual = recompute(data)
     assert actual == data["summary"], "Published summary differs from numerical records"
+    assert weighted_usage(data) == json.loads((ROOT / "USAGE.json").read_text()), "Usage ratios differ from recorded tokens"
     print(json.dumps(actual, ensure_ascii=False, indent=2))
