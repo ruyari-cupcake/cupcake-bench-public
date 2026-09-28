@@ -4,6 +4,11 @@
   "unchangedFrom": {
     "rounds/round3-2026-09-07/evidence/opus55-lane/aggregate-final/metrics.json": 21
   },
+  "rateTable": "rounds/round3-2026-09-07/evidence/quota-rate-table-2026-09-28.json",
+  "addedRateFamilies": [
+    "sol6",
+    "luna6"
+  ],
   "lanes": {
     "opus55": {
       "status": "COMPLETE",
@@ -47,7 +52,8 @@
       "owed": {
         "main": [],
         "repeat": []
-      }
+      },
+      "countMismatches": []
     },
     "sonnet-haiku": {
       "status": "COMPLETE",
@@ -98,7 +104,8 @@
       "owed": {
         "main": [],
         "repeat": []
-      }
+      },
+      "countMismatches": []
     },
     "sol6": {
       "status": "COMPLETE",
@@ -142,7 +149,8 @@
       "owed": {
         "main": [],
         "repeat": []
-      }
+      },
+      "countMismatches": []
     },
     "luna6": {
       "status": "COMPLETE",
@@ -186,7 +194,8 @@
       "owed": {
         "main": [],
         "repeat": []
-      }
+      },
+      "countMismatches": []
     }
   }
 }
