@@ -4,6 +4,14 @@
   "latestPublished": "morrow-sol61-main-2026-09-30",
   "entries": [
     {
+      "id": "sol61-comparison-2026-09-30",
+      "title": "GPT-6.1 Sol next to five reference models",
+      "links": {
+        "report": "rounds/sol61-comparison-2026-09-30/public/README.md",
+        "summary": "rounds/sol61-comparison-2026-09-30/public/SUMMARY.md"
+      }
+    },
+    {
       "id": "morrow-sol61-main-2026-09-30",
       "title": "Morrow — GPT-6.1 Sol as main agent",
       "links": {
