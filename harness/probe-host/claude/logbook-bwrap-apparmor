@@ -1,0 +1,12 @@
+# Logbook's MCP exec uses the distro bubblewrap, not Codex's embedded sandbox.
+# Grant namespace creation to this exact binary while retaining Ubuntu's global
+# unprivileged-userns restriction. Isolation remains bwrap's --unshare-all/mounts
+# inside the already restricted per-cell systemd unit. No setuid or capabilities
+# on the executable are required. Install as /etc/apparmor.d/logbook-bwrap.
+abi <abi/4.0>,
+include <tunables/global>
+
+profile logbook-bwrap /usr/bin/bwrap flags=(unconfined) {
+  userns,
+  include if exists <local/logbook-bwrap>
+}

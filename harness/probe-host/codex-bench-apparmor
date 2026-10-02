@@ -1,0 +1,30 @@
+# Cupcake Bench — grant unprivileged user-namespace creation to the codex sandbox binary
+# ONLY, leaving Ubuntu's apparmor_restrict_unprivileged_userns hardening ON for every other
+# process on this host.
+#
+# Why this profile exists, and why the global sysctl was rejected:
+#   codex builds its command sandbox with bubblewrap. With `network_access = false` the
+#   sandbox needs its own network namespace, and configuring loopback inside it needs
+#   capabilities that Ubuntu's AppArmor userns restriction strips from unconfined binaries.
+#   The failure looks like:
+#       bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+#   The blunt fix is `sysctl kernel.apparmor_restrict_unprivileged_userns=0`, which relaxes
+#   the hardening for EVERY local process. This host also runs the owner's live proxies used
+#   by other people, so the relaxation is scoped to one binary instead.
+#
+# `flags=(unconfined)` keeps the binary otherwise unconfined — this profile adds a
+# permission, it does not attempt to sandbox codex. The real isolation is the `bench` user,
+# which owns no credentials, no repositories and no history.
+#
+# Reverting: remove this file and run `apparmor_parser -R /etc/apparmor.d/codex-bench`.
+# Repo copy: cupcake-bench/harness/probe-host/codex-bench-apparmor
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+profile codex-bench /home/bench/node/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex flags=(unconfined) {
+  userns,
+
+  include if exists <local/codex-bench>
+}

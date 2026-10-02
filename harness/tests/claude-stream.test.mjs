@@ -31,7 +31,9 @@ test('frozen Claude answer stream preserves result, provider usage, cost and acc
   assert.equal(parsed.completedTurnCount, 1);
   assert.equal(parsed.toolCallCount, 0);
   assert.equal(outcome(parsed), 'ok');
-  assert.deepEqual(Object.keys(parsed).sort(), [...Object.keys(parseCodexStream('')), 'providerUsage', 'costUsd', 'anthropicUtilization'].sort());
+  assert.deepEqual(parsed.servedModels, ['claude-opus-5']);
+  assert.deepEqual(parsed.refusalFallbacks, []);
+  assert.deepEqual(Object.keys(parsed).sort(), [...Object.keys(parseCodexStream('')), 'providerUsage', 'costUsd', 'anthropicUtilization', 'servedModels', 'refusalFallbacks'].sort());
 });
 
 test('frozen Claude agentic stream counts actions separately and never sums cumulative result usage', async () => {

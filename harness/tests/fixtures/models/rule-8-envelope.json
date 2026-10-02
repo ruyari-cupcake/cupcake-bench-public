@@ -1,0 +1,6 @@
+{
+  "formatVersion": 2,
+  "families": [
+    {"family":"probe","model":"gpt-5.6-luna","displayName":"Probe","order":0,"backend":"codex","efforts":["high"],"cli":null,"pricing":{"kind":"unpriced"},"added":"2026-09-30","note":"Only formatVersion is invalid."}
+  ]
+}

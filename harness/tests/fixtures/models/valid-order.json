@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1,
+  "families": [
+    {"family":"z-priced","model":"gpt-5.6-luna","displayName":"Zero-rate boundary","order":90,"backend":"codex","efforts":["high","low"],"cli":"codex","pricing":{"kind":"credits","input":0,"cachedInput":0.25,"output":12.5,"source":"Synthetic numeric-boundary fixture, not production pricing","fetched":"2026-09-30"},"added":"2026-09-30","note":"Array order, not alphabetical or numeric order, is authoritative."},
+    {"family":"deepseek-flash","model":"deepseek-v4-flash","displayName":"DeepSeek Flash","order":30,"backend":"codex","provider":"deepseek","efforts":["max","none"],"cli":null,"pricing":{"kind":"unpriced"},"added":"2026-09-30","note":"Provider and none effort mirror the pre-change runner."},
+    {"family":"a-capable","model":"claude-sonnet-5","displayName":"Capability provider combination","order":20,"backend":"claude","provider":"fixture-provider","efforts":["high"],"cli":null,"pricing":{"kind":"capabilityOnly","reason":"Tests provider-before-capabilityOnly field order"},"added":"2026-09-30","note":"Synthetic allowed combination of independent optional fields."},
+    {"family":"haiku45","model":"claude-haiku-4-5","displayName":"Haiku 4.5","order":10,"backend":"claude","efforts":[null],"configName":"haiku45","cli":null,"pricing":{"kind":"capabilityOnly","reason":"No benchmark credit price"},"added":"2026-09-30","note":"Singleton/null effort mirrors the captured production runner."}
+  ]
+}

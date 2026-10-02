@@ -1,0 +1,7 @@
+{
+  "formatVersion": 1,
+  "families": [
+    {"family":"probe","model":"gpt-5.6-luna","displayName":"Probe","order":0,"backend":"codex","efforts":["high"],"cli":null,"pricing":{"kind":"unpriced"},"added":"2026-09-30","note":"Synthetic contract fixture; duplicate family has disjoint config names."},
+    {"family":"probe","model":"gpt-5.6-luna","displayName":"Probe second","order":1,"backend":"codex","efforts":["low"],"cli":null,"pricing":{"kind":"unpriced"},"added":"2026-09-30","note":"Only the family identity is duplicated."}
+  ]
+}

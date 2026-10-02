@@ -147,8 +147,8 @@ function assessValidity(runs, varianceRuns) {
   };
 }
 
-function configFamily(config) {
-  return ['terra', 'luna', 'sol', 'astra'].find((family) => String(config).startsWith(`${family}-`)) ?? null;
+function configFamily(config, rateFamilies) {
+  return rateFamilies.find((family) => String(config).startsWith(`${family}-`)) ?? null;
 }
 
 function taskFamily(id) {
@@ -402,6 +402,10 @@ async function main() {
     ? await loadJson(flags['historical-task-classes'], null, missing, 'historicalTaskClasses') : null;
   const estimate = quotaEstimate(flags['quota-multipliers']
     ? await loadJson(flags['quota-multipliers'], null, missing, 'quotaMultipliers') : null);
+  // History is pinned to the dated table supplied for this build, never the live registry.
+  // Longest boundary wins when a family name itself contains another family's prefix.
+  const rateFamilies = Object.keys(estimate?.families ?? estimate?.multipliers ?? {})
+    .sort((left, right) => right.length - left.length);
   const taskIds = [...new Set([
     ...(Array.isArray(runs) ? runs.map((run) => run?.task) : []),
     ...(Array.isArray(varianceRuns) ? varianceRuns.map((run) => run?.task) : []),
@@ -503,7 +507,7 @@ async function main() {
         missingGradeCount,
         passRate: total && !missingGradeCount ? successes / total : null,
         passRateLower95: missingGradeCount ? null : wilson(successes, total, WILSON_ONE_SIDED_Z).low,
-        quotaUnits: taskQuotaUnits(taskCells, (estimate?.families ?? estimate?.multipliers)?.[configFamily(config)]),
+        quotaUnits: taskQuotaUnits(taskCells, (estimate?.families ?? estimate?.multipliers)?.[configFamily(config, rateFamilies)]),
         finalScore: mean(taskCells.map((cell) => cell.finalScore)),
         normalizedScore: mean(taskCells.map((cell) => cell.normalizedScore)),
         mechanicalPercent: mean(taskCells.map((cell) => cell.mechanicalPercent)),
@@ -528,7 +532,7 @@ async function main() {
       outputKey,
       configCells.filter((cell) => tokenValue(cell, usageKey) === null).length,
     ]));
-    const family = configFamily(config);
+    const family = configFamily(config, rateFamilies);
     const routingTasks = Object.entries(perTask).filter(([task]) => !anchorFamilies.has(task)).map(([, value]) => value);
     const anchorTasks = Object.entries(perTask).filter(([task]) => anchorFamilies.has(task)).map(([, value]) => value);
     const rawMean = mean(routingTasks.map((task) => task.mechanicalScore));

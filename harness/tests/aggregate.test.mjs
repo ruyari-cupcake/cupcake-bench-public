@@ -488,6 +488,31 @@ test('credit cost sums eligible cells including failures and selects the config 
   assert.equal(result.perConfig['terra-high'].quotaProxy, null);
 });
 
+test('GPT-6 sol6/luna6 configs take their own rate rows, never the GPT-5.6 sol/luna rows', async (t) => {
+  const usage = { input_tokens: 20000, cached_input_tokens: 15000, output_tokens: 500 };
+  const rates = { source: 'test card', unit: 'credits per 1M tokens', families: {
+    luna: { input: 5, cachedInput: 0.5, output: 30 },
+    sol: { input: 100, cachedInput: 10, output: 500 },
+    sol6: { input: 50, cachedInput: 5, output: 250 },
+    luna6: { input: 2.5, cachedInput: 0.25, output: 12.5 },
+  } };
+  const result = await aggregate(t, [cell(100, 100, { usage }),
+    cell(100, 100, { config: 'luna6-low', usage }),
+    cell(100, 100, { config: 'sol6-high', usage }),
+    cell(100, 100, { config: 'sol-high', usage })], { quotaMultipliers: rates });
+  assert.deepEqual(result.perConfig['luna6-low'].quotaProxy, rates.families.luna6);
+  assert.deepEqual(result.perConfig['sol6-high'].quotaProxy, rates.families.sol6);
+  assert.deepEqual(result.perConfig['sol-high'].quotaProxy, rates.families.sol);
+  // (5000*2.5 + 15000*0.25 + 500*12.5)/1e6 and (5000*50 + 15000*5 + 500*250)/1e6.
+  assert.equal(result.perConfig['luna6-low'].perTask.A4.quotaUnits, 0.0225);
+  assert.equal(result.perConfig['sol6-high'].perTask.A4.quotaUnits, 0.45);
+  assert.equal(result.perConfig['luna-low'].perTask.A4.quotaUnits, 0.0475);
+  // A card without the GPT-6 rows leaves them unpriced rather than borrowing the GPT-5.6 rate.
+  const older = await aggregate(t, [cell(100, 100, { config: 'luna6-low', usage })],
+    { quotaMultipliers: { ...rates, families: { luna: rates.families.luna, sol: rates.families.sol } } });
+  assert.equal(older.perConfig['luna6-low'].quotaProxy, null);
+});
+
 test('rate costs require every cost token field in every eligible cell, but allow zero cache', async (t) => {
   const usage = { input_tokens: 20000, cached_input_tokens: 15000, output_tokens: 500 };
   const records = ['input_tokens', 'cached_input_tokens', 'output_tokens'].flatMap((field, index) => {

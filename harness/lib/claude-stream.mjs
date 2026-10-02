@@ -42,6 +42,11 @@ export function parseClaudeStream(stdout) {
   let anthropicUtilization = null;
   let malformedLines = 0;
   let webEvents = 0;
+  // Model identity as SERVED, not as requested: a refusal fallback hands the rest of the
+  // session to another model (Opus 5.5 -> 4.8 observed 2026-09-27), and the only trace is
+  // each assistant message's own `model` plus a system event.
+  const servedModels = new Set();
+  const refusalFallbacks = [];
   for (const line of stdout.split('\n')) {
     const trimmed = line.trim();
     if (!trimmed) continue;
@@ -54,6 +59,7 @@ export function parseClaudeStream(stdout) {
     }
     threadId = event.session_id ?? threadId;
     if (event.type === 'assistant') {
+      if (typeof event.message?.model === 'string') servedModels.add(event.message.model);
       const content = event.message?.content;
       if (Array.isArray(content)) {
         if (content.length) modelOutputObserved = true;
@@ -74,6 +80,8 @@ export function parseClaudeStream(stdout) {
     } else if (event.type === 'rate_limit_event') {
       const windows = event.rate_limit_info?.unifiedWindows;
       anthropicUtilization = { fiveHour: windows?.five_hour?.utilization ?? null, sevenDay: windows?.seven_day?.utilization ?? null };
+    } else if (event.type === 'system' && event.subtype === 'model_refusal_fallback') {
+      refusalFallbacks.push({ originalModel: event.original_model ?? null, fallbackModel: event.fallback_model ?? null, category: event.api_refusal_category ?? null });
     } else if (event.type === 'error') {
       streamErrors.push(event.error?.message ?? event.message ?? JSON.stringify(event));
     }
@@ -91,5 +99,6 @@ export function parseClaudeStream(stdout) {
     turnCount: toolCalls.length, stepCount: toolCalls.length, toolCallCount: toolCalls.length,
     toolCallsByType, toolCalls, webEvents, malformedLines, streamErrors,
     providerUsage, costUsd: finalResult?.total_cost_usd ?? null, anthropicUtilization,
+    servedModels: [...servedModels].sort(), refusalFallbacks,
   };
 }

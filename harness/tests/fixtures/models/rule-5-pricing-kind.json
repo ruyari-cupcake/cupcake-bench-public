@@ -1,0 +1,6 @@
+{
+  "formatVersion": 1,
+  "families": [
+    {"family":"probe","model":"gpt-5.6-luna","displayName":"Probe","order":0,"backend":"codex","efforts":["high"],"cli":null,"pricing":{"kind":"credits","input":5,"cachedInput":0.5,"output":30,"source":"Synthetic contract fixture based on the 2026-09-30 Luna rate row","fetched":"2026-09-30","reason":"Capability-only field must not coexist with credits"},"added":"2026-09-30","note":"All required credit fields are present; only the mixed pricing kind is invalid."}
+  ]
+}

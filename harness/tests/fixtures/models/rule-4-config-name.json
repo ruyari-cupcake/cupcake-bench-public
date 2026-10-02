@@ -1,0 +1,6 @@
+{
+  "formatVersion": 1,
+  "families": [
+    {"family":"probe","model":"claude-haiku-4-5","displayName":"Probe","order":0,"backend":"claude","efforts":[null],"cli":null,"pricing":{"kind":"capabilityOnly","reason":"Synthetic singleton"},"added":"2026-09-30","note":"Real haiku45 null-effort shape, with only its required configName removed."}
+  ]
+}
