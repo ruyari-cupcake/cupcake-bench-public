@@ -1,8 +1,17 @@
 {
   "formatVersion": 1,
   "pathBase": "repository-root",
-  "latestPublished": "morrow-sol61-main-2026-09-30",
+  "latestPublished": "maintenance-siblings-2026-09-30",
   "entries": [
+    {
+      "id": "maintenance-siblings-2026-09-30",
+      "title": "Maintenance siblings — eight maintenance requests, 27 configurations, question turns",
+      "links": {
+        "report": "rounds/maintenance-siblings-2026-09-30/public/README.md",
+        "summary": "rounds/maintenance-siblings-2026-09-30/public/SUMMARY.md",
+        "results": "rounds/maintenance-siblings-2026-09-30/public/RESULTS.json"
+      }
+    },
     {
       "id": "sol61-comparison-2026-09-30",
       "title": "GPT-6.1 Sol next to five reference models",
