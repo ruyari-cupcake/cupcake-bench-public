@@ -1,8 +1,16 @@
 {
   "formatVersion": 1,
   "pathBase": "repository-root",
-  "latestPublished": "morrow-haiku55-main-2026-10-08",
+  "latestPublished": "haiku55-comparison-2026-10-08",
   "entries": [
+    {
+      "id": "haiku55-comparison-2026-10-08",
+      "title": "Claude Haiku 5.5 next to five reference models",
+      "links": {
+        "report": "rounds/haiku55-comparison-2026-10-08/public/README.md",
+        "summary": "rounds/haiku55-comparison-2026-10-08/public/SUMMARY.md"
+      }
+    },
     {
       "id": "morrow-haiku55-main-2026-10-08",
       "title": "Morrow — Claude Haiku 5.5 as main agent",
