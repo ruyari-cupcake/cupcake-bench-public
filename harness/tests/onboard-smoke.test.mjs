@@ -48,7 +48,7 @@ function records(root,name,round) {
   const row=family(root,name);
   return row.efforts.filter(e=>round!=='h1'||['low','medium','high','xhigh'].includes(e)).map((effort,i)=>({
     task:round==='r5'?'Q1':round==='h1'?'H1':'D1',config:effort===null?row.configName:`${name}-${effort}`,repeat:1,label:'smoke',
-    backend:row.backend,venue:`oracle-${row.backend}-v1`,model:row.model,effort,exitCode:0,outcome:'ok',processExited:true,timedOut:false,
+    backend:row.backend,venue:`oracle-${row.backend}-v1`,model:row.model,effort,exitCode:0,outcome:'ok',streamErrors:[],processExited:true,timedOut:false,
     cwd:`/tmp/cupcake-bench-workspaces/abcdef12-0000-4000-8000-00000000000${i}-abc123`,...(row.backend==='claude'?{modelBindingValid:true}:{}),
   }));
 }
@@ -85,7 +85,7 @@ test('P4 smoke prints fresh one-cell outputs per config and never runs or writes
     const seen=[];
     for(const line of lines) {
       assert.equal(line.flags.repeats,'1');assert.equal(line.flags.only.split(',').length,1,'one task, not the entire campaign');
-      assert.equal(line.flags['cell-timeout-ms'],'3600000');assert.equal(line.flags['spawn-module'],'harness/probe-host/codex/remote-spawn.mjs');
+      assert.equal(line.flags['cell-timeout-ms'],round==='r3'?undefined:'3600000');assert.equal(line.flags['spawn-module'],'harness/probe-host/codex/remote-spawn.mjs');
       seen.push(...line.flags.configs.split(','));assert.notEqual(line.output,line.input);outputs.push(line.output);
       assert.doesNotMatch(line.output,/(?:runs-sol61(?:-crit(?:-repeat)?)?\.json)$/,'never overwrite a real committed lane output');
     }
@@ -110,6 +110,37 @@ for(const name of ['sol61','sonnet55','haiku45']) test(`P4 smoke-check passes ev
   const root=fixture(t);const rounds=name==='haiku45'?['r5']:['r3','r5','h1'];evidence(root,name,rounds);const before=tree(root);
   const result=invoke(root,'smoke-check',name,rounds.join(','));assert.equal(result.status,0,result.text);
   passLines(result.text,rounds.flatMap(r=>records(root,name,r)));assert.deepEqual(tree(root),before);
+});
+
+const fallbackMetadata = 'Model metadata for `gpt-6.1-sol` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.';
+for (const name of ['sol61', 'sonnet55']) {
+  for (const fault of ['non-ok', 'missing-outcome', 'stream-error', 'missing-errors', 'non-array-errors']) {
+    test(`smoke-check rejects ${name} ${fault} and prints the offending outcome and streamErrors`, t => {
+      const root = fixture(t);
+      evidence(root, name, ['r5']);
+      let offending;
+      mutate(root, 'readback/r5/runs.json', rows => {
+        offending = rows.at(-1);
+        if (fault === 'non-ok') offending.outcome = 'harness_invalid';
+        if (fault === 'missing-outcome') delete offending.outcome;
+        if (fault === 'stream-error') offending.streamErrors = [fallbackMetadata];
+        if (fault === 'missing-errors') delete offending.streamErrors;
+        if (fault === 'non-array-errors') offending.streamErrors = '';
+      });
+      const result = expectFail(root, name, 'r5', offending.config);
+      assert.ok(result.text.includes(`outcome=${JSON.stringify(offending.outcome) ?? 'undefined'}`), result.text);
+      assert.ok(result.text.includes(`streamErrors=${JSON.stringify(offending.streamErrors) ?? 'undefined'}`), result.text);
+    });
+  }
+}
+
+test('smoke-check rejects a degraded duplicate even if its first record and binding report pass', t => {
+  const root = fixture(t);
+  evidence(root, 'sol61', ['r5']);
+  mutate(root, 'readback/r5/runs.json', rows => { rows.push({ ...rows[0], repeat: 2, streamErrors: [fallbackMetadata] }); });
+  put(root, 'readback/r5/bindings.json', { checked: 6, failures: [] });
+  const result = expectFail(root, 'sol61', 'r5', 'sol61-low');
+  assert.ok(result.text.includes(`streamErrors=${JSON.stringify([fallbackMetadata])}`), result.text);
 });
 
 test('P4 smoke-check rejects an effort mismatch even when all runner exits and binding summary say success',t=>{

@@ -47,6 +47,20 @@ test('reclassifies through current rules, preserves all other fields, and backs 
   assert.deepEqual(summary.files[0].changes['model_failure→harness_invalid'], [{ task: failed.task, config: failed.config, repeat: failed.repeat }]);
 });
 
+test('persisted complete-stderr metadata evidence invalidates truncated records without losing fields', async t => {
+  const source = { ...okay, stderrTail: 'ordinary stderr only\n', timedOut: true,
+    stderrFailures: { modelMetadata: true, transport: true, quotaExhausted: false, providerCapacity: false, venue: false },
+    rawStreamPath: '/fixture/retained.jsonl', gitDiffPath: '/fixture/retained.diff' };
+  const s = await setup(t, [source, okay]);
+  const result = run(s.file);
+  assert.equal(result.status, 0, result.stderr);
+  const expected = [{ ...source, outcome: 'harness_invalid', reclassifiedFrom: 'ok' }, okay];
+  assert.deepEqual(JSON.parse(await readFile(s.file, 'utf8')), expected);
+  const summary = JSON.parse(result.stdout);
+  assert.equal(await readFile(summary.files[0].backup, 'utf8'), s.original);
+  assert.deepEqual(JSON.parse(await readFile(s.file, 'utf8')), expected, 'reopen preserves every identity and artifact reference');
+});
+
 test('unchanged runs are byte-preserved and create no backup', async (t) => {
   const s = await setup(t, [okay, { ...failed, timedOut: true }]);
   const result = run(s.file);

@@ -16,6 +16,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -42,7 +43,13 @@ class CliMapTests(unittest.TestCase):
         self.cell.CELLS.mkdir()
         self.cell.PAUSE_FLAG = self.root / 'PAUSE'
         self.cell.AUTH_FILE = self.root / 'auth.json'
-        self.cell.AUTH_FILE.write_text('{"fixture":"not-a-real-token"}')
+        claims = base64.urlsafe_b64encode(json.dumps({'exp': time.time() + 86400, 'iat': time.time() - 100}).encode()).decode().rstrip('=')
+        self.cell.AUTH_FILE.write_text(json.dumps({'tokens': {'access_token': 'header.' + claims + '.signature'}}))
+        if hasattr(self.cell, 'cell_uid'):
+            # useradd is mocked; the Codex launcher derives loopback proxy ports from this uid.
+            uid = mock.patch.object(self.cell, 'cell_uid', return_value=612)
+            uid.start()
+            self.addCleanup(uid.stop)
         # Preserve default constant before supplying the isolated installed-map seam.
         self.installed_map = getattr(self.cell, 'CLI_MAP_PATH', None)
         self.map_path = self.root / 'cli-map.json'
@@ -102,7 +109,7 @@ class CliMapTests(unittest.TestCase):
     def prepare_continuation(self):
         cell = self.cell.CELLS / CELL
         (cell / 'home/.claude').mkdir(parents=True)
-        (cell / 'home/auth.json').write_text('{"fixture":"saved"}')
+        (cell / 'home/auth.json').write_bytes(self.cell.AUTH_FILE.read_bytes())
         (cell / 'ws').mkdir()
         (cell / 'ws/fixture.txt').write_bytes(b'keep workspace')
         (cell / 'launch.json').write_text(json.dumps({'cwd': CWD, 'profile': 'default',

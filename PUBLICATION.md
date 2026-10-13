@@ -28,7 +28,9 @@
 
 **By round**
 - **Round 3:** the problems, graders, run data and original report published earlier stay as they are.
-  - The root [EXPORT-MANIFEST.json](EXPORT-MANIFEST.json) is the historical record of that Round 3 export.
+  - The root [EXPORT-MANIFEST.json](EXPORT-MANIFEST.json) is the historical record of the 2026-09-11 full-harness
+    export that carried the Round 3 problems and graders (`harness/`). Its `round` field reads
+    `round5-complex-work` because that export run also included the Round 5 directory.
   - It is not a global manifest verifying later changes to the root navigation documents.
 - **Round 4:**
   - Published: the apps, requests, correct and incorrect references and checks of the 2 public examples.
@@ -51,6 +53,10 @@
 - Hashes help identify public files. They do not prove the grading is valid or that there was no training exposure.
 
 **Corrections**
+- **2026-10-14 corrections:** a reader audit found wording errors, with no score change: Round 3 setup and lower-bound
+  descriptions (44 + 4 anchors; n = 5), the table renderer's fixed "n=7" sentence in Round 3/5 evidence tables, the
+  Round 5 task-A failure description, a "25" for "100" in the Morrow fixed-team method, this page's description of
+  the root manifest, and two links in PUBLISHING.md to a private guide. Each corrected page carries its own note.
 - When a grader defect is found, the original results are kept, and the version and the impact of the change are
   explained.
 - When problems change between rounds or the source data is private, the limits on comparison and reproduction are

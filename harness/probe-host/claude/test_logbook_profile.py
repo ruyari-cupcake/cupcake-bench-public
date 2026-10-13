@@ -52,6 +52,25 @@ class LogbookProfileTests(unittest.TestCase):
                 launcher.validate_resume_args(base64.b64encode(json.dumps(args + extra).encode()).decode(), staged=True, profile_name='logbook', cwd=CWD)
 
 
+    def test_logbook_model_effort_allow_list(self):
+        launcher = load()
+        # Sonnet stays the default and keeps its exact argv; Haiku 5.5 adds max; anything else is refused.
+        assert launcher.logbook_args(CWD, 'high') == launcher.logbook_args(CWD, 'high', None, 'claude-sonnet-5-5')
+        haiku = launcher.logbook_args(CWD, 'max', SESSION, 'claude-haiku-5-5')
+        assert haiku[:5] == ['-p', '--model', 'claude-haiku-5-5', '--effort', 'max']
+        assert haiku[5:] == launcher.logbook_args(CWD, 'high', SESSION)[5:]
+        payload = base64.b64encode(json.dumps(haiku).encode()).decode()
+        parsed, session = launcher.validate_resume_args(payload, staged=True, profile_name='logbook', cwd=CWD)
+        assert parsed == haiku and session == SESSION
+        for model, effort in [('claude-sonnet-5-5', 'max'), ('claude-opus-5-5', 'high'), ('claude-haiku-4-5', 'high')]:
+            with self.assertRaises(SystemExit):
+                launcher.logbook_args(CWD, effort, None, model)
+        tampered = launcher.logbook_args(CWD, 'high', SESSION, 'claude-haiku-5-5')
+        tampered[tampered.index('--model') + 1] = 'claude-opus-5-5'
+        with self.assertRaises(SystemExit):
+            launcher.validate_resume_args(base64.b64encode(json.dumps(tampered).encode()).decode(), staged=True, profile_name='logbook', cwd=CWD)
+
+
     def test_bwrap_apparmor_grants_only_binary_userns(self):
         profile = Path(__file__).with_name('logbook-bwrap-apparmor')
         assert profile.is_file(), 'bwrap requires its own AppArmor userns grant'

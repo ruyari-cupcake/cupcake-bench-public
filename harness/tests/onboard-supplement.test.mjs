@@ -154,7 +154,7 @@ test('P5b facts follow changed lane inputs; capability-only and null effort neve
 
 test('P5b refuses invalid round, unknown family/date/options and unsupported backend without writes', t => {
   const root=fixture(t), before=tree(root);
-  for (const [round,family,args] of [['bad','sol62',[]],['r5','absent',[]],['r5','sol62',['--bad']],['r5','sol62',['--date=bad']],['harbor','sonnet55',[]]]) {
+  for (const [round,family,args] of [['bad','sol62',[]],['r5','absent',[]],['r5','sol62',['--bad']],['r5','sol62',['--date=bad']],['harbor','deepseek-flash',[]]]) {
     const r=invoke(root,round,family,['--write',...args]); assert.notEqual(r.status,0); assert.deepEqual(tree(root),before);
   }
 });

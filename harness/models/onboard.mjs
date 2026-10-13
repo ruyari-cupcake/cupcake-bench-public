@@ -16,9 +16,13 @@ import { configName, roundEfforts, effortSelections, parseRounds, runnerPolicy, 
 const PACKAGES = { codex: '@openai/codex', claude: '@anthropic-ai/claude-code' };
 const PROBE_TASKS = 'rounds/round3-2026-09-07/evidence/sol61-lane/tasks-isolation-probe.json';
 const SSH_OPTIONS = ['-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes'];
+// host-check.py reserves this exit for the Codex models auth prerequisite;
+// its raw SSH/HTTP output must remain private even when the credential fails.
+const CODEX_MODELS_AUTH_FAILURE_EXIT = 75;
+const CODEX_RELOGIN_REQUIRED = 're-login required (docs/isolated-probe-host.md § Re-login)';
 const CHECKS = [
   ['preflight', 'no-model preflight prerequisite (--version)'],
-  ['prerequisites', 'isolation prerequisites (read-only; not a cell isolation proof)'],
+  ['prerequisites', 'isolation prerequisites (Codex master refresh; not a cell isolation proof)'],
 ];
 
 function quote(value) {
@@ -28,6 +32,33 @@ function quote(value) {
 function checkCommand(stage, family, model, binding) {
   return ['sudo', 'python3', '-B', '-', stage, family.backend, model, binding.cliRoot, binding.cliVersion]
     .map(quote).join(' ');
+}
+
+export async function authPreflight(campaignSeconds, { root = REPO_ROOT } = {}) {
+  const budget = Number(campaignSeconds);
+  if (!Number.isFinite(budget) || budget <= 0) throw new Error('auth_expiry: --campaign-seconds must be positive and finite');
+  let result;
+  try {
+    // Local generation/snapshot verification must not depend on SSH venue setup.
+    const { probeSshArgs } = await import('../probe-host/venue.mjs');
+    result = spawnSync('ssh', [...probeSshArgs(SSH_OPTIONS),
+      ['sudo', 'python3', '-B', '-', 'auth', String(budget)].map(quote).join(' ')], {
+      input: readFileSync(resolve(root, 'harness/models/host-check.py'), 'utf8'), encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'], timeout: 60_000,
+    });
+  } catch {
+    throw new Error('auth_expiry: probe-host credential preflight unavailable');
+  }
+  // Never echo ssh stderr or arbitrary helper text (host/key/credential may be in it).
+  let metadata;
+  try { metadata = JSON.parse(result.stdout); } catch { /* fail closed below */ }
+  if (metadata && Number.isFinite(metadata.exp) && metadata.exp >= 0 && metadata.exp <= 253402300799
+      && Number.isFinite(metadata.remainingHours)) {
+    console.log(`access_token exp: ${new Date(metadata.exp * 1000).toISOString()}; remaining hours: ${metadata.remainingHours.toFixed(2)}`);
+  } else {
+    throw new Error('auth_expiry: unreadable or malformed credential preflight');
+  }
+  if (result.error || result.status !== 0) throw new Error('auth_expiry: campaign refused; re-login and repeat preflight');
 }
 
 export function hostPrep(familyName, { run = false, root = REPO_ROOT } = {}) {
@@ -55,6 +86,20 @@ export function hostPrep(familyName, { run = false, root = REPO_ROOT } = {}) {
   console.log(`node harness/models/cli-map.mjs --out ${quote(`${source}/${mapName}`)}  # generate locally before staging`);
   console.log(`sudo install -o root -g root -m 0644 ${quote(`${source}/${mapName}`)} ${quote(`/usr/local/bin/${mapName}`)}`);
   console.log(`sudo install -o root -g root -m 0644 ${quote(`${source}/${provenanceName}`)} ${quote(`/usr/local/bin/${provenanceName}`)}`);
+  if (family.backend === 'codex') {
+    for (const helper of ['auth_lock.py', 'auth_expiry.py', 'auth_refresh.py', 'models_check.py', 'auth_failure.py']) {
+      console.log(`sudo install -o root -g root -m 0644 ${quote(`${source}/${helper}`)} ${quote(`/usr/local/bin/${helper}`)}`);
+    }
+    console.log(`sudo install -o root -g root -m 0755 ${quote(`${source}/auth_refresh.py`)} '/usr/local/bin/bench-codex-auth-refresh'`);
+    for (const unit of ['bench-codex-auth-refresh.service', 'bench-codex-auth-refresh.timer']) {
+      console.log(`sudo install -o root -g root -m 0644 ${quote(`${source}/${unit}`)} ${quote(`/etc/systemd/system/${unit}`)}`);
+    }
+    console.log('Preserve previous installed bytes with .prev-<sha8>; follow docs/isolated-probe-host.md#master-writer-timer-lock-and-recovery.');
+    console.log('sudo systemctl daemon-reload');
+    console.log('sudo /usr/local/bin/bench-codex-auth-refresh  # one root exchange; require outcome ok and models200 true');
+    console.log('sudo systemctl enable --now bench-codex-auth-refresh.timer  # only after the one-shot succeeds');
+    console.log("sha256sum /usr/local/bin/auth_{lock,expiry,refresh,failure}.py /usr/local/bin/models_check.py /usr/local/bin/bench-codex-auth-refresh  # shared helpers and writer");
+  }
   console.log(`sha256sum ${quote(launcher)} ${quote(`/usr/local/bin/${mapName}`)} ${quote(`/usr/local/bin/${provenanceName}`)}  # record installed sha256 values`);
   console.log(`Registry sha256: ${provenance.registrySha256}`);
   console.log('AppArmor check on host: sudo aa-status; verify the grant covers the mapped CLI and its cell path.');
@@ -82,7 +127,9 @@ export function hostPrep(familyName, { run = false, root = REPO_ROOT } = {}) {
     });
     // Do not relay ssh/helper output: it may contain a host, key path or credential.
     if (result.error || result.status !== 0) {
-      console.log(`FAIL ${label}`);
+      const authFailure = stage === 'prerequisites' && family.backend === 'codex'
+        && result.status === CODEX_MODELS_AUTH_FAILURE_EXIT;
+      console.log(`FAIL ${label}${authFailure ? ` — ${CODEX_RELOGIN_REQUIRED}` : ''}`);
       process.exitCode = 1;
       return;
     }
@@ -92,10 +139,11 @@ export function hostPrep(familyName, { run = false, root = REPO_ROOT } = {}) {
 
 const RATE_FIELDS = ['input', 'cachedInput', 'output'];
 const COMMAND_OPTIONS = {
+  'auth-preflight': ['root', 'campaign-seconds'],
   'host-prep': ['root', 'run'],
   price: ['root', 'base', 'out'],
   lanes: ['root', 'rounds', 'date', 'allow-date', 'write', 'efforts', 'round-efforts'],
-  data: ['root', 'from', 'write'],
+  data: ['root', 'from', 'write', 'format', 'metadata'],
   'verify-snapshot': ['root'],
   supplement: ['root', 'date', 'write'],
   smoke: ['root', 'rounds'],
@@ -212,7 +260,7 @@ export function smoke(ctx, rounds) {
       for (const effort of policy.efforts) {
         const output = `${directory}/${configName(ctx.entry, effort)}.json`;
         files.push(output);
-        console.log(runnerCommand(ctx.entry, { manifest: policy.source, output, efforts: [effort],
+        console.log(runnerCommand(ctx.entry, { cellTimeoutMs: policy.cellTimeoutMs, manifest: policy.source, output, efforts: [effort],
           tasks: [policy.tasks[0]], repeats: 1, concurrency: 1, label: 'smoke' }));
       }
       const merge = `const fs=require('node:fs');const rows=${JSON.stringify(files)}.flatMap(f=>JSON.parse(fs.readFileSync(f,'utf8')));fs.writeFileSync(${JSON.stringify(`${directory}/runs.json`)},JSON.stringify(rows,null,2)+'\\n',{flag:'wx'});`;
@@ -264,7 +312,7 @@ export function smoke(ctx, rounds) {
       printJsonPreparation(smokeFile, spec);
       console.log(`python3 -B harness/probe-host/fixed-team/campaign/generate.py ${smokeFile}`);
       console.log('# morrow: stage the generated campaign and tools to the fresh remote paths before launching.');
-      console.log(`ssh -i "$CUPCAKE_BENCH_PROBE_KEY" "$CUPCAKE_BENCH_PROBE_HOST" ${shellQuote(`bash ${spec.remoteRoot}/campaign/supervise.sh`)}`);
+      console.log(`ssh -i "$CUPCAKE_BENCH_PROBE_KEY" "$CUPCAKE_BENCH_PROBE_HOST" ${shellQuote(`sudo bash ${spec.remoteRoot}/campaign/supervise.sh`)}`);
       console.log(`python3 -B harness/probe-host/fixed-team/campaign/finish.py fetch ${smokeFile}  # after mains and workers end`);
       console.log(`python3 -B harness/probe-host/fixed-team/campaign/grade-cells.py ${smokeFile} --jobs 1  # grading-barrier checks every binding before grading`);
     }
@@ -292,13 +340,18 @@ export function smokeCheck(ctx, rounds, from) {
     } catch (error) { problem = error.message; }
     for (const config of expected) {
       const records = Array.isArray(rows) ? rows.filter(row => row?.config === config.name) : [];
-      const valid = !problem && records.length > 0 && records.every(row => row.backend === ctx.entry.backend
+      // Binding/exit success cannot certify a degraded venue. Require explicit
+      // clean outcomes on every record, including later duplicate cells.
+      const degraded = records.filter(row => row.outcome !== 'ok'
+        || !Array.isArray(row.streamErrors) || row.streamErrors.length !== 0);
+      const valid = !problem && records.length > 0 && degraded.length === 0
+        && records.every(row => row.backend === ctx.entry.backend
         && row.model === ctx.entry.model && row.effort === config.effort && row.exitCode === 0
         && row.timedOut !== true && row.processExited !== false
-        && (row.outcome === undefined || row.outcome === 'ok')
         && (ctx.entry.backend !== 'claude' || row.modelBindingValid === true))
         && (ctx.entry.backend !== 'codex' || !report.failures.some(failure => failure.config === config.name));
-      console.log(`${valid ? 'PASS' : 'FAIL'} ${round} ${config.name}${valid ? '' : ' — missing, invalid or mismatched binding evidence'}`);
+      const details = degraded.map(row => `outcome=${JSON.stringify(row.outcome) ?? 'undefined'} streamErrors=${JSON.stringify(row.streamErrors) ?? 'undefined'}`).join('; ');
+      console.log(`${valid ? 'PASS' : 'FAIL'} ${round} ${config.name}${valid ? '' : ` — missing, invalid or mismatched binding evidence${details ? `; ${details}` : ''}`}`);
       success &&= Boolean(valid);
     }
   }
@@ -308,6 +361,10 @@ export function smokeCheck(ctx, rounds, from) {
 export function main(args = process.argv.slice(2)) {
   const [command, first, ...rest] = args;
   if (command === 'release-manifest') return import('./release-manifest.mjs').then(api => api.releaseManifest(args.slice(1))).catch(error => { console.error(error.message); process.exitCode = 1; });
+  if (command === 'auth-preflight') {
+    const options = parseOptions(command, args.slice(1));
+    return authPreflight(options['campaign-seconds'], { root: resolve(options.root ?? REPO_ROOT) });
+  }
   const family = ['supplement', 'data'].includes(command) ? rest[0] : first;
   const flags = ['supplement', 'data', 'verify-snapshot'].includes(command) ? rest.slice(1) : rest;
   assert.ok(family && !family.startsWith('--'), 'onboard requires a family');
@@ -317,7 +374,7 @@ export function main(args = process.argv.slice(2)) {
   const ctx = context(family, root);
   if (command === 'verify-snapshot') return verifySnapshot(ctx, rest[0]);
   if (command === 'price') return price(ctx, options);
-  if (command === 'data') return data(ctx, first, options.from, options.write);
+  if (command === 'data') return data(ctx, first, options.from, options.write, { format: options.format, metadata: options.metadata });
   if (command === 'supplement') return supplement(ctx, first, dateValue(options.date), options.write);
   const rounds = parseRounds(options.rounds);
   if (command === 'lanes') {
@@ -333,5 +390,5 @@ export function main(args = process.argv.slice(2)) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { main(); } catch (error) { console.error(error.message); process.exitCode = 1; }
+  try { await main(); } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

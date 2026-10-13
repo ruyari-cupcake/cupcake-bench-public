@@ -65,6 +65,40 @@ test('relabel-priced changes only appended runs, and an identical rerun is a no-
   assert.deepEqual(JSON.parse(readFileSync(`${f.lane}/runs-sol61.json`)), f.runs);
 });
 
+test('only stream-proven capped binding failures pass merge, preserving every original run and grade', t => {
+  const f = fixture(t);
+  const rawStreamPath = path.join(f.dir, 'cap.jsonl');
+  writeFileSync(rawStreamPath, JSON.stringify({ type: 'result', is_error: true,
+    result: "API Error: Claude's response exceeded the 32000 output token maximum" }));
+  Object.assign(f.runs[0], { backend: 'claude', outcome: 'harness_invalid', modelBindingValid: false, rawStreamPath });
+  f.save();
+  json(`${f.lane}/bindings-${f.family}.json`, { checked: f.runs.length, failures: [f.runs[0]] });
+  const result = f.invoke();
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(`${f.out}/runs-with-${f.family}.json`)), [...f.baseRuns, ...f.runs]);
+  assert.deepEqual(JSON.parse(readFileSync(`${f.out}/mechanical-with-${f.family}.json`)), [...f.baseMechanical, ...f.mechanical]);
+});
+
+test('Claude lane uses recorded binding checks without requiring a Codex receipt report', t => {
+  const f = fixture(t);
+  f.runs.forEach(run => Object.assign(run, { backend: 'claude', modelBindingValid: true }));
+  f.save();
+  rmSync(`${f.lane}/bindings-${f.family}.json`);
+  const result = f.invoke();
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(`${f.out}/runs-with-${f.family}.json`)), [...f.baseRuns, ...f.runs]);
+});
+
+test('Claude non-cap binding failure cannot be hidden by an empty report', t => {
+  const f = fixture(t);
+  Object.assign(f.runs[0], { backend: 'claude', modelBindingValid: false, outcome: 'harness_invalid' });
+  f.save();
+  const result = f.invoke();
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /binding/i);
+  assert.equal(existsSync(f.out), false);
+});
+
 for (const [name, mutate, error] of [
   ['duplicate replacing missing cell', f => { f.runs[0] = { ...f.runs[1] }; f.mechanical[0] = { ...f.mechanical[1] }; f.save(); }, /duplicate.*identity/],
   ['same-count foreign task', f => { f.runs[0].task = 'Q404'; f.mechanical[0].task = 'Q404'; f.save(); }, /exact.*identit/],

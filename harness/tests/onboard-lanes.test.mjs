@@ -124,7 +124,7 @@ test('P4 lanes dry run lists every destination and launch without writing even a
   noLeaks(result.text);
 });
 
-for(const round of ['r3','r5','h1']) test(`P4 ${round} sol61 executable arguments equal committed lane plus watchdog`,t=>{
+for(const round of ['r3','r5','h1']) test(`P4 ${round} sol61 executable arguments equal committed lane with recorded protocol bounds`,t=>{
   const root=fixture(t);const before=tree(root);ok(invoke(root,'sol61',round));
   const run=destinations('sol61',round).find(p=>p.endsWith('/run.sh'));
   const actual=runners(read(root,run),root);const expected=runners(read(repo,oracle[round]),repo);
@@ -136,7 +136,7 @@ for(const round of ['r3','r5','h1']) test(`P4 ${round} sol61 executable argument
   assert.doesNotMatch(script,/^\s*wait\b/m,'both R3 runners launch before waiting');
   assert.deepEqual(json(root,join(dirname(run),'registry-snapshot.json')),family(root,'sol61'));
   for(let i=0;i<expected.length;i++) {
-    const a={...actual[i].args},e={...expected[i].args,'cell-timeout-ms':'3600000'};
+    const a={...actual[i].args},e={...expected[i].args,...(round==='r3'?{}:{'cell-timeout-ms':'3600000'})};
     // Committed knob files contain post-ramp values: admission.sh records starts 8/4.
     if(round==='r3') e.concurrency=String([8,4][i]);
     // Only the h1 date changes in fixture/destination paths; output filename is
@@ -228,7 +228,7 @@ for(const name of ['sonnet55','haiku45','deepseek-flash']) test(`P4 ${name} uses
     for(const line of runners(read(root,run),root)) {
       assert.deepEqual(line.args.configs.split(','),configs(row,round));
       assert.equal(line.args['spawn-module'],`harness/probe-host/${row.backend}/remote-spawn.mjs`);
-      assert.equal(line.args['cell-timeout-ms'],'3600000');
+      assert.equal(line.args['cell-timeout-ms'],round==='r3'?undefined:'3600000');
       if(row.backend==='claude') assert.doesNotMatch(JSON.stringify(line.args),/codex|model_provider|cli-root/);
     }
   }

@@ -41,6 +41,9 @@ test('P4 generated shell runs from unrelated cwd with exact root and runner argu
   const root = fixture(t);
   cpSync(join(repo, 'harness/models'), join(root, 'harness/models'), { recursive: true });
   cpSync(join(repo, 'harness/lane-files.mjs'), join(root, 'harness/lane-files.mjs'));
+  put(root, 'harness/probe-host/venue.mjs', readFileSync(join(repo, 'harness/probe-host/venue.mjs')));
+  put(root, 'bin/ssh', `#!${process.execPath}\nimport('node:fs').then(fs => { fs.readFileSync(0); console.log(JSON.stringify({exp: 2000000000, remainingHours: 240})); });\n`);
+  chmodSync(join(root, 'bin/ssh'), 0o755);
   put(root, 'bin/git', '#!/bin/sh\nprintf "fixture-head-123\\n"\n');
   chmodSync(join(root, 'bin/git'), 0o755);
   put(root, 'harness/runner.mjs', `import { writeFileSync } from 'node:fs';
@@ -52,7 +55,8 @@ writeFileSync(process.env.P4_STUB_RECORD, JSON.stringify({ cwd: process.cwd(), a
   assert.equal(generated.status, 0, `lane generation must succeed: ${generated.stdout}${generated.stderr}`);
   const record = join(root, 'stub-record.json');
   const run = spawnSync('bash', [join(root, lane, 'run.sh')], {
-    cwd: unrelated, env: { ...process.env, P4_STUB_RECORD: record, PATH: join(root,'bin')+':'+process.env.PATH }, encoding: 'utf8', timeout: 10000,
+    cwd: unrelated, env: { ...process.env, P4_STUB_RECORD: record, PATH: join(root,'bin')+':'+process.env.PATH,
+      BENCH_AUTH_BUDGET_SECONDS: '3600', CUPCAKE_BENCH_PROBE_HOST: 'fixture.invalid', CUPCAKE_BENCH_PROBE_KEY: 'fixture-key' }, encoding: 'utf8', timeout: 10000,
   });
   assert.ifError(run.error);
   assert.equal(run.status, 0, run.stdout + run.stderr);

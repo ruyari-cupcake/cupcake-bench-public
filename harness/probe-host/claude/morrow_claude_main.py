@@ -282,6 +282,9 @@ def run_main(args, tools, command):
     tools.command(git + ['add', '-N', '.'])
     patch = tools.command(git + ['diff', '--binary', 'HEAD', '--', *PATCH_PATHS])
     (cell / 'changes.patch').write_text(patch)
+    # Workers.server_close may raise after joining a refused child. Persist the
+    # observed main usage first so that shared owner can classify this receipt.
+    (cell / 'result.json').write_text(json.dumps(receipt, indent=2))
     return receipt
 
 

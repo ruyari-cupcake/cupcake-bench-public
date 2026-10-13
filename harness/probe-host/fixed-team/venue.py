@@ -8,7 +8,15 @@ import pwd
 import shutil
 import subprocess
 import time
+import sys
 
+# Staged fixed-team tools share the host-prep-installed guard; source tests use its canon.
+_AUTH_SOURCE = Path(__file__).resolve().parents[1] / 'codex'
+sys.path.insert(0, str(_AUTH_SOURCE if _AUTH_SOURCE.is_dir() else Path('/usr/local/bin')))
+from auth_expiry import AUTH_REFUSAL_KINDS, AuthRefusal, campaign_deadline, copy_auth, planned_budget, require_auth_lifetime, refusal_receipt
+from auth_failure import capture_auth_failure
+
+AUTH_FILE = Path('/home/bench/codex-home/auth.json')
 CLI_ROOT = Path('/var/lib/bench-ceilings/tools/codex-0.159.0')
 CLI = '/home/bench/codex-cli/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex'
 WORKSPACE = '/home/bench/workspaces/task'
@@ -58,10 +66,21 @@ def copy_snapshot(source, dest):
     return inventory
 
 
-def create_cell(root, source, username, model, effort, prompt, instructions='', bridge=None):
+def create_cell(root, source, username, model, effort, prompt, instructions='', bridge=None, auth_budget_seconds=None, auth_deadline=None):
     root = Path(root)
     root.mkdir(parents=True, exist_ok=False)
     root.chmod(0o700)
+    try:
+        budget = planned_budget(auth_budget_seconds)
+        deadline = campaign_deadline(budget, deadline=auth_deadline)
+        require_auth_lifetime(AUTH_FILE, None, deadline=deadline)
+        home = root / 'home'
+        home.mkdir(mode=0o700)
+        copy_receipt = {}
+        copy_auth(AUTH_FILE, home / 'auth.json', None, deadline=deadline, receipt=copy_receipt)
+    except AuthRefusal as error:
+        (root / 'result.json').write_text(json.dumps(refusal_receipt(error), indent=2))
+        raise
     try:
         account = pwd.getpwnam(username)
     except KeyError:
@@ -70,10 +89,6 @@ def create_cell(root, source, username, model, effort, prompt, instructions='', 
     workspace = root / 'workspaces/task'
     inventory = copy_snapshot(source, workspace)
     (root / 'input.json').write_text(json.dumps(inventory, indent=2))
-    home = root / 'home'
-    home.mkdir(mode=0o700)
-    shutil.copyfile('/home/bench/codex-home/auth.json', home / 'auth.json')
-    (home / 'auth.json').chmod(0o600)
     config = f'''model = {json.dumps(model)}
 model_reasoning_effort = {json.dumps(effort)}
 approval_policy = "never"
@@ -111,13 +126,23 @@ socks_url = "http://127.0.0.1:{20001 + 2 * (account.pw_uid % 20000)}"
     command(git + ['add', '-A'])
     command(git + ['-c', 'user.name=bench', '-c', 'user.email=bench@localhost', 'commit', '--allow-empty', '-qm', 'Project snapshot'])
     command(['chown', '-R', f'{username}:{account.pw_gid}', str(workspace / '.git')])
-    spec = {'root': str(root), 'username': username, 'model': model, 'effort': effort, 'bridge': str(bridge) if bridge else None}
+    spec = {'root': str(root), 'username': username, 'model': model, 'effort': effort, 'bridge': str(bridge) if bridge else None,
+            'authBudgetSeconds': budget, 'authDeadline': deadline, **copy_receipt}
     (root / 'spec.json').write_text(json.dumps(spec, indent=2))
     return spec
 
 
 def run_cell(spec, unit):
     root = Path(spec['root'])
+    try:
+        deadline = spec.get('authDeadline')
+        require_auth_lifetime(root / 'home/auth.json',
+                              None if deadline is not None else planned_budget(spec.get('authBudgetSeconds')),
+                              deadline=deadline)
+    except AuthRefusal as error:
+        receipt = refusal_receipt(error)
+        (root / 'result.json').write_text(json.dumps(receipt, indent=2))
+        return receipt
     props = [
         'TemporaryFileSystem=/home/bench:mode=0755',
         'BindReadOnlyPaths=/home/bench/node:/home/bench/node',
@@ -148,6 +173,7 @@ def run_cell(spec, unit):
     (root / 'service.log').write_text(service_log)
     receipt = {'exit': result.returncode, 'elapsedSeconds': time.time() - start,
                'requestedModel': spec['model'], 'requestedEffort': spec['effort']}
+    receipt.update({key: spec[key] for key in ('authCopyPolicy', 'refreshTokenBlank', 'authSnapshotSha256') if key in spec})
     events = [json.loads(line) for line in (root / 'stream.jsonl').read_text().splitlines()]
     if completed_before_cleanup_timeout(result.returncode, service_log, events,
                                         (root / 'workspaces/final.txt').is_file()):
@@ -168,6 +194,11 @@ def run_cell(spec, unit):
     receipt['turnContexts'] = contexts
     receipt['modelBindingValid'] = bool(contexts) and all(c == {'model': spec['model'], 'effort': spec['effort']} for c in contexts)
     receipt['providerReturnedModel'] = None  # CLI does not expose this independently.
+    auth_failure = capture_auth_failure(root)
+    if auth_failure:
+        receipt.update(auth_failure)
+        with (root / 'stderr.log').open('a') as diagnostic:
+            diagnostic.write('bench-codex-cell: ' + auth_failure['reason'] + '\n')
     workspace = root / 'workspaces/task'
     git = ['git', '-c', f'safe.directory={workspace}', '-C', str(workspace)]
     command(git + ['add', '-N', '.', ':!.delegations', ':!.codex', ':!.agents'])

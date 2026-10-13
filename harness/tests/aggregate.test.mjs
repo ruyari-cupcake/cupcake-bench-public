@@ -96,6 +96,35 @@ test('token observations include paid excluded and failed cells without inventin
   assert.deepEqual(observed.costUsd, { cellCount: 2, missingCount: 2, total: 0.2, mean: 0.1 });
 });
 
+test('environment cap exclusions survive primary and variance aggregation without invalidating rankings or permitting reruns', async t => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'aggregate-cap-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const rawStreamPath = path.join(dir, 'stream.jsonl');
+  await writeFile(rawStreamPath, JSON.stringify({ type: 'result', is_error: true,
+    result: "API Error: Claude's response exceeded the 32000 output token maximum. To configure this behavior, set the CLAUDE_CODE_MAX_OUTPUT_TOKENS environment variable." }));
+  const capped = cell(100, 100, { repeat: 2, backend: 'claude', outcome: 'harness_invalid',
+    modelBindingValid: false, exitCode: 1, timedOut: false, rawStreamPath, omitGrade: true });
+  const before = await aggregate(t, [cell(80, 100, { config: 'historical' })]);
+  const result = await aggregate(t, [cell(80, 100, { config: 'historical' }), cell(60), capped], {
+    variance: [{ ...cell(100), answer: 'ok' }, { ...capped, repeat: 3 }],
+  });
+  assert.equal(result.status, 'OK');
+  assert.equal(result.perConfig['luna-low'].environmentLimitExcluded, 1);
+  assert.equal(result.validity.perConfig['luna-low'].environmentLimitExcluded, 2);
+  assert.equal(result.validity.harnessInvalidCount, 0);
+  assert.equal(result.perConfig['luna-low'].normalizedMean, 60);
+  assert.equal(result.perConfig['luna-low'].perTask.A4.total, 1);
+  assert.equal(result.variance.A4['luna-low'].environmentLimitExcluded, 1);
+  assert.equal(result.variance.A4['luna-low'].total, 1);
+  assert.equal(result.variance.A4['luna-low'].passRate, 1);
+  assert.equal(result.invalidCells.length, 2);
+  assert.ok(result.invalidCells.every(row => row.outcome === 'environment_limit' && row.rerunPermitted === false));
+  assert.equal(result.cells.find(row => row.repeat === 2).mechanicalScore, null);
+  assert.equal(result.tokenUsage['luna-low'].cellCount, 2, 'resource observations retain excluded cells');
+  assert.deepEqual(result.perConfig.historical, before.perConfig.historical);
+  assert.deepEqual(result.validity.perConfig.historical, before.validity.perConfig.historical);
+});
+
 function repeated(count, overrides = {}) {
   return Array.from({ length: count }, (_, index) => cell(80, 100, { repeat: index + 1, ...overrides }));
 }

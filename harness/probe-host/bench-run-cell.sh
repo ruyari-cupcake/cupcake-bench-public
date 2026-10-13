@@ -9,6 +9,9 @@
 # Usage (run as root or via sudo):
 #   /usr/local/bin/bench-run-cell.sh <fixture-dir> <prompt-file> <workdir> [config-overrides...]
 set -euo pipefail
+# This legacy path gives Codex the master home and violates writer ownership.
+echo 'bench-run-cell.sh retired: use bench-codex-cell' >&2
+exit 75
 
 # The `bench` user cannot traverse /home/ubuntu, so anything launched with sudo -u bench
 # from an operator's home dies with "Failed to restore initial working directory". Move to

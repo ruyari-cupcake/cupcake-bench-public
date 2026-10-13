@@ -42,7 +42,7 @@ class CampaignTests(unittest.TestCase):
             'source': '/home/ubuntu/bench-inbox/morrow-2026-09-26',
             'accountPrefix': 'example', 'promptSource': 'prompt-source.txt',
             'gradingVenue': 'venue', 'workerRateCard': 'rates.json',
-            'concurrency': {'initial': 4, 'load': 2},
+            'concurrency': {'initial': 4, 'load': 2}, 'authBudgetSeconds': 86400,
         }
         (self.root / 'spec.json').write_text(json.dumps(self.spec))
         (self.root / 'prompt-source.txt').write_bytes(b'Please fix this.\n\n')
