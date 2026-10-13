@@ -1,8 +1,17 @@
 {
   "formatVersion": 1,
   "pathBase": "repository-root",
-  "latestPublished": "haiku55-comparison-2026-10-08",
+  "latestPublished": "patchwork-twist-2026-10-13",
   "entries": [
+    {
+      "id": "patchwork-twist-2026-10-13",
+      "title": "Patchwork twist Y4 — one repair request, eight hidden loss histories, 32 configurations",
+      "links": {
+        "report": "rounds/patchwork-twist-2026-10-13/public/README.md",
+        "summary": "rounds/patchwork-twist-2026-10-13/public/SUMMARY.md",
+        "results": "rounds/patchwork-twist-2026-10-13/public/RESULTS.json"
+      }
+    },
     {
       "id": "haiku55-comparison-2026-10-08",
       "title": "Claude Haiku 5.5 next to five reference models",
